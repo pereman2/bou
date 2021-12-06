@@ -1,0 +1,64 @@
+#pragma once
+enum token_type {
+  // TODO: add string literal, module, modulo, and, or, xor, neg ...
+  T_INT,
+  T_BOOL,
+  T_STRING,
+  T_STRING_LITERAL,
+  T_CHAR,
+  T_DEF,
+  T_STRUCT,
+  T_IF,
+  T_ELSE,
+  T_FOR,
+  T_WHILE,
+  T_BREAK,
+  T_CONTINUE,
+  T_RETURN,
+  T_FLOAT,
+  T_DOUBLE,
+  T_IDENTIFIER,
+
+  T_LEFT_PAR,
+  T_RIGHT_PAR,
+  T_LEFT_BRACE,
+  T_RIGHT_BRACE,
+  T_DOT,
+  T_PLUS,
+  T_MINUS,
+  T_STAR,
+  T_SLASH,
+  T_SHIFT_RIGHT,
+  T_SHIFT_LEFT,
+  T_SEMICOLON,
+  T_COLON,
+  T_COMMA,
+
+  T_BANG,
+  T_BANG_EQUAL,
+  T_EQUAL,
+  T_EQUAL_EQUAL,
+  T_GREATER,
+  T_GREATER_EQUAL,
+  T_LESS,
+  T_LESS_EQUAL,
+
+  // Are this useful?
+  T_TAB,
+  T_LF,
+  // this should be useful because:
+  // v: int = 312432 4234
+  // should fail
+  // pasrser should have something like semicolon if we want more than one expresion in the same line
+  T_SPACE, 
+
+  T_ERROR,
+  T_EOF,
+};
+
+struct Token {
+  token_type type;
+  char *start;
+  char *end;
+  int line;
+};
