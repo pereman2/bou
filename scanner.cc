@@ -15,7 +15,7 @@ void init_scanner(char *src) {
   scanner.token_count = 0;
   scanner.token_capacity = 8;
   scanner.tokens = (Token **)malloc(sizeof(Token *) * scanner.token_capacity);
-  ensure_alloc(scanner.tokens, __LINE__, __FILE__);
+  ensure_alloc(scanner.tokens, __FILE__, __LINE__);
 }
 
 void free_scanner() {
@@ -170,16 +170,19 @@ Token *create_string_token() {
 //   https://github.com/lotabout/write-a-C-interpreter/blob/master/tutorial/en/3-Lexer.md
 // - lexer struct
 //   https://youtu.be/HxaD_trXwRE?t=1034
+// - go lexer with concurrency
+//   https://www.youtube.com/watch?v=HxaD_trXwRE
 
 int get_tokens_len() {
   return scanner.token_count;
 }
+
 void append_token(Token *token) {
   if (scanner.token_count >= scanner.token_capacity) {
     scanner.token_capacity *= 2;
     scanner.tokens = (Token **)realloc(
         scanner.tokens, sizeof(Token *) * scanner.token_capacity);
-    ensure_alloc(scanner.tokens, __LINE__, __FILE__);
+    ensure_alloc(scanner.tokens, __FILE__, __LINE__);
   }
   scanner.tokens[scanner.token_count++] = token;
 }
@@ -194,9 +197,14 @@ Token **scan(char *src) {
   return scanner.tokens;
 }
 
+void ignore() {
+  while (*scanner.ip == ' ') {
+    scanner.ip++;
+  }
+}
 Token *scan_token() {
+  ignore();
   scanner.start = scanner.ip;
-
   if (is_numeric(peek())) {
     return create_numeric_token();
   }

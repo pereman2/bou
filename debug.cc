@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
+#include "darray.h"
 #include "debug.h"
 #include "token.h"
 
@@ -148,4 +149,15 @@ void print_token(Token *t) {
   }
   printf("Token %s - stored value \"%.*s\" - line %d - mem %p\n", type,
          (int)(t->end - t->start), t->start, t->line, t->start);
+}
+
+
+void dump_darray(darray *da) {
+  for (int i = 0; i < da->count; i++) {
+    printf("0x%02X ", (unsigned char)da->src[i]);
+    // let's write 8 bytes per line
+    if (i % 8 == 0 && i > 0) {
+      printf("\n");
+    }
+  }
 }
