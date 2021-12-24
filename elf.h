@@ -7,4 +7,4 @@
 #define DATA_START_ADDR 0x600000
 #define ALIGNMENT 0x200000
 
-void write_elf(darray *da);
+void write_elf(darray *da, size_t text_size);

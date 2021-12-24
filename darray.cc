@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cstdarg>
 #include <stdlib.h>
+#include <string.h>
 #include "darray.h"
 #include "util.h"
 
@@ -13,6 +14,14 @@ void init_darray(darray *da) {
 
 void free_darray(darray *da) {
   free(da->src);
+}
+
+// Push same bytes a number of times
+void push_repicated_byte(darray* da, int num_bytes, int byte) {
+  while (num_bytes + da->count > da->capacity) {
+    grow_darray(da);
+  }
+  memset(&da->src[da->count], byte, num_bytes);
 }
 
 /*

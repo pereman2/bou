@@ -22,8 +22,13 @@ void compile(char *src) {
   Ast_node *root = parse(tokens, len_tokens);
 
   init_compiler();
-  write_elf(&state.code);
+  write_elf(&state.code, state.code.count);
   compile_ast(root);
+  // sys exit
+  push_bytes_code(5, 0xb8, 0x01, 0x00, 0x00, 0x00);
+  push_bytes_code(5, 0xbb, 0x00, 0x00, 0x00, 0x00); // mov rbx, 0x0
+  push_bytes_code(2, 0xcd, 0x80); // int 0x80
+
   dump_darray(&state.code);
   write_to_file(&state.code, "program");
   free_compiler();
@@ -89,14 +94,15 @@ void compile_binary_expr(Ast_node *node) {
 
 void emit_add(operand dest, operand src) {
   if (dest.type == operand::REG && src.type == operand::REG) { // 32 reg add reg, reg
-    char mod_r_w = (src.value.reg << 3) | dest.value.reg | 0x02;
+    // modR/M -> 2 bits mode, 3 bits reg/m, 3 bits register
+    char mod_r_w = (0x03 << 6) | (src.value.reg << 3) | dest.value.reg;
     push_bytes_code(2, 0x01, mod_r_w);
   }
 }
 void emit_mov(operand dest, operand src) {
   if (dest.type == operand::REG && src.type == operand::IMM) { // 32 imm mov reg, imm
     // b8+ rd id = b8 + register id
-    push_bytes(&state.code, 2, 0xb8+dest.value.reg, src.value.imm);
+    push_bytes(&state.code, 5, 0xb8+dest.value.reg, src.value.imm, 0x00, 0x00, 0x00);
   }
 }
 
