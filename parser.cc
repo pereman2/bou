@@ -55,7 +55,7 @@ Ast_node *term() {
     } else {
       bin->expr.binary->op = Ast_binary::ADD;
     }
-    bin->expr.binary->right = factor();
+    bin->expr.binary->right = term();
     return bin;
   }
   return t;

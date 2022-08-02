@@ -22,15 +22,14 @@ void compile(char *src) {
   Ast_node *root = parse(tokens, len_tokens);
 
   init_compiler();
-  write_elf(&state.code, state.code.count);
   compile_ast(root);
+
   // sys exit
   push_bytes_code(5, 0xb8, 0x01, 0x00, 0x00, 0x00);
   push_bytes_code(5, 0xbb, 0x00, 0x00, 0x00, 0x00); // mov rbx, 0x0
   push_bytes_code(2, 0xcd, 0x80); // int 0x80
 
-  dump_darray(&state.code);
-  write_to_file(&state.code, "program");
+  write_elf(&state.code, state.code.count);
   free_compiler();
   exit(1);
 }
@@ -57,6 +56,7 @@ char next_register() {
 
 void compile_ast(Ast_node *node) {
   switch (node->type) {
+    // TODO: literals logic should be nil for now.
   case node_type::LITERAL:
     {
       char r = next_register();
@@ -73,6 +73,9 @@ void compile_ast(Ast_node *node) {
   }
 }
 
+// (3 + 4) + 5
+// 3 + 4
+// 7 + 5
 void compile_binary_expr(Ast_node *node) {
   compile_ast(get_binary(node)->left);
   compile_ast(get_binary(node)->right);

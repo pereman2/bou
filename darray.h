@@ -16,9 +16,13 @@ typedef struct darray {
   std::size_t capacity, count;
 } darray;
 
+darray* create_darray();
 void push_replicated_byte(darray *da, int num, int byte);
 void push_bytes(darray *da, int num, ...);
+void push_darray(darray *dest, darray *src);
+void push_string(darray* da, int num_bytes, const char* str);
 void grow_darray(darray *da);
 void init_darray(darray *da);
 void free_darray(darray *da);
+std::size_t length(darray *da);
 void write_to_file(darray *da, const char *path);

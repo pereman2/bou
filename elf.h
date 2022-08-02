@@ -1,10 +1,16 @@
 #pragma once
 
 #include "darray.h"
+#include <string>
+#include <vector>
 
 
-#define START_ADDR 0x400000
-#define DATA_START_ADDR 0x600000
-#define ALIGNMENT 0x200000
+#define START_ADDR 0x80000000
 
-void write_elf(darray *da, size_t text_size);
+static const std::vector<std::string> section_names = {
+  ".shrtrtab",
+  ".text"
+};
+static std::size_t section_name_size; 
+
+void write_elf(darray *text, size_t text_size);

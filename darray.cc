@@ -6,6 +6,10 @@
 #include "util.h"
 
 
+darray* create_darray() {
+	darray *da = (darray*) malloc(sizeof(darray));
+	return da;
+}
 void init_darray(darray *da) {
   da->capacity = 8;
   da->count = 0;
@@ -17,7 +21,7 @@ void free_darray(darray *da) {
 }
 
 // Push same bytes a number of times
-void push_repicated_byte(darray* da, int num_bytes, int byte) {
+void push_replicated_byte(darray* da, int num_bytes, int byte) {
   while (num_bytes + da->count > da->capacity) {
     grow_darray(da);
   }
@@ -39,6 +43,20 @@ void push_bytes(darray* da, int num_bytes, ...) {
   }
 }
 
+void push_darray(darray *dest, darray *src) {
+	for (int i = 0; i < src->count; i++) {
+		push_dvalue(dest, char, src->src[i]);
+	}
+}
+
+void push_string(darray* da, int num_bytes, const char* str) {
+  while (num_bytes + da->count > da->capacity) {
+    grow_darray(da);
+  }
+	memcpy(&da->src[da->count], str, num_bytes);
+	da->count += num_bytes;
+}
+
 void grow_darray(darray *da) {
   std::size_t new_capacity = (da->capacity << 1);
   char *r = (char*)realloc(da->src, new_capacity);
@@ -57,4 +75,8 @@ void write_to_file(darray *da, const char* path) {
 
   fwrite(da->src, sizeof(char), da->count, fd);
   fclose(fd);
+}
+
+std::size_t length(darray *da) {
+  return da->count;
 }

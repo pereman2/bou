@@ -3,7 +3,37 @@
 
 #include "darray.h"
 #include "debug.h"
+#include "ast_node.h"
 #include "token.h"
+
+// Identifier of the ast_node
+int ast_num = 0;
+
+void print_ast(Ast_node *root) {
+  eval_ast(root);
+  print_ast_node(root);
+}
+
+// add identifiers to each ast_node
+void eval_ast(Ast_node *root) {
+}
+
+
+void print_ast_node(Ast_node *root) {
+  char *type;
+  switch (root->type) {
+  case BINARY:
+    printf("%d BINARY (%d + %d)\n", ast_num, ast_num+1, ast_num+2);
+    ast_num++;
+    print_ast(get_binary(root)->left);
+    print_ast(get_binary(root)->right);
+    break;
+  case LITERAL:
+    printf("%d LITERAL INT %d\n", ast_num, get_literal(root)->value.i);
+    break;
+  }
+
+}
 
 void print_tokens(Token **tokens, int len) {
   for (int i = 0; i < len; i++) {
@@ -161,3 +191,4 @@ void dump_darray(darray *da) {
     }
   }
 }
+
