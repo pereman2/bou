@@ -2,7 +2,25 @@ the BOU language
 ================
 
 
-**todo**
+Why
+---
+
+bored
+
+Current functionality:
+---------------------
+
+sum of 2 ints :O
+
+```
+cmake .
+make
+echo "3+3" | ./bou
+./program
+```
+
+Todo
+----
 
 * use FA lexer
 * parser + ast
