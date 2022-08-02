@@ -24,12 +24,17 @@ statements -> block | ifstmt | loopstmt | funcstmt | structstmt
 literal binary unary group
 
 expr       -> assignment 
+
 decl       -> ident + colon + type + (equal + term)? 
+
 assignment -> ident + equal + term
+
 term       -> factor (('+'|'-')factor)*
+
 factor     -> literal
 
 literal -> num | float_num | boolean | char | string
+
 string -> quote whatever quote
 
 
