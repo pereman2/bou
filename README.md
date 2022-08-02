@@ -12,13 +12,23 @@ Current functionality:
 
 sum of 2 ints :O
 
-```
+```sh
 cmake .
 make
 echo "3+3" | ./bou
 ./program
 ```
 
+outstanding optimizations:
+```asm
+0000000080000078 <.text>:
+    80000078:   b8 03 00 00 00          mov    $0x3,%eax
+    8000007d:   b9 03 00 00 00          mov    $0x3,%ecx
+    80000082:   01 c8                   add    %ecx,%eax
+    80000084:   b8 01 00 00 00          mov    $0x1,%eax
+    80000089:   bb 00 00 00 00          mov    $0x0,%ebx
+    8000008e:   cd 80                   int    $0x80
+```
 Todo
 ----
 
