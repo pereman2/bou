@@ -32,16 +32,13 @@ outstanding optimizations:
 Todo
 ----
 
-* use FA lexer
-* parser + ast
-* IR optimizations
-  - local
-  - ...
-* emit code https://github.com/skx/assembler/blob/master/compiler/compiler.go
-* write an assembler https://github.com/vishen/go-x64-executable/blob/master/main.go
-  (ELS executable)
-  - instruction scheduler~~
-  - register allocation
+* Lexer 
+  - [ ] FA lexer?
+
+* Code generation / IR representation
+  - [ ] Improve instruction selection
+  - [ ] Add instruction scheduler
+  - [ ] Instruction allocation
 
 
 Spec

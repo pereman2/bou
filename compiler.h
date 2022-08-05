@@ -50,6 +50,7 @@ struct operand {
 typedef struct compiler_state {
   char register_ip;
   darray code;
+  int *register_descriptors;
 } compiler_state;
 
 extern compiler_state state;

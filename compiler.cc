@@ -35,6 +35,10 @@ void compile(char *src) {
 }
 
 void init_compiler() {
+  state.register_descriptors = (int*) malloc(sizeof(int) * NUM_REGISTERS);
+  for(int rd = 0; rd < NUM_REGISTERS; rd++) {
+    state.register_descriptors[rd] = 0;
+  }
   state.register_ip = 0;
   init_darray(&state.code);
 }
@@ -59,12 +63,12 @@ void compile_ast(Ast_node *node) {
     // TODO: literals logic should be nil for now.
   case node_type::LITERAL:
     {
-      char r = next_register();
-      operand dest = {type: operand::REG, size: 32};
-      dest.value.reg = r;
-      operand src = {type: operand::IMM, size: 32};
-      src.value.imm = get_literal(node)->value.i;
-      emit_mov(dest, src);
+      // char r = next_register();
+      // operand dest = {type: operand::REG, size: 32};
+      // dest.value.reg = r;
+      // operand src = {type: operand::IMM, size: 32};
+      // src.value.imm = get_literal(node)->value.i;
+      // emit_mov(dest, src);
     }
     break;
   case node_type::BINARY:
@@ -77,22 +81,47 @@ void compile_ast(Ast_node *node) {
 // 3 + 4
 // 7 + 5
 void compile_binary_expr(Ast_node *node) {
-  compile_ast(get_binary(node)->left);
-  compile_ast(get_binary(node)->right);
+  if (get_binary(node)->left->type == node_type::BINARY) {
+    compile_ast(get_binary(node)->left);
+  } else if (get_binary_left(node)->type == node_type::LITERAL) {
+    if (state.register_descriptors[0]) {
+      operand dest = {type: operand::REG, size: 32};
+      dest.value.reg = 0;
+      operand src = {type: operand::REG, size: 32};
+      src.value.reg = 1;
+      emit_mov(dest, src);
+    } else {
+      operand dest = {type: operand::REG, size: 32};
+      dest.value.reg = 0;
+      operand src = {type: operand::IMM, size: 32};
+      src.value.imm = get_binary_left(node)->expr.literal->value.i;
+      emit_mov(dest, src);
+    }
+  }
+  if (get_binary(node)->right->type == node_type::BINARY) {
+    compile_ast(get_binary(node)->right);
+  } else if (get_binary(node)->right->type == node_type::LITERAL) {
+    operand dest = {type: operand::REG, size: 32};
+    dest.value.reg = 1;
+    operand src = {type: operand::IMM, size: 32};
+    src.value.imm = get_binary_right(node)->expr.literal->value.i;
+    emit_mov(dest, src);
+  }
   switch((get_binary(node))->op) {
   case Ast_binary::ADD:
     {
       // for now let's expect only register in add
       operand dest = {type: operand::REG, size: 32};
-      dest.value.reg = state.register_ip - 2;
+      dest.value.reg = 0;
       operand src = {type: operand::REG, size: 32};
-      src.value.reg = state.register_ip - 1;
+      src.value.reg = 1;
       emit_add(dest, src);
     }
     break;
   case Ast_binary::SUB:
     break;
   }
+  state.register_descriptors[0] = 1;
 }
 
 void emit_add(operand dest, operand src) {
@@ -102,13 +131,13 @@ void emit_add(operand dest, operand src) {
     push_bytes_code(2, 0x01, mod_r_w);
   }
 }
+
 void emit_mov(operand dest, operand src) {
   if (dest.type == operand::REG && src.type == operand::IMM) { // 32 imm mov reg, imm
     // b8+ rd id = b8 + register id
     push_bytes(&state.code, 5, 0xb8+dest.value.reg, src.value.imm, 0x00, 0x00, 0x00);
+  } else if (dest.type == operand::REG && src.type == operand::REG) {
+    char mod_r_w = (0x03 << 6) | (src.value.reg << 3) | dest.value.reg;
+    // push_bytes(&state.code, 5, 0xb8, mod_r_w, 0x00, 0x00, 0x00);
   }
 }
-
-// void emit(instruction_type type, operand dest, operand src) {
-//   // put_bytes(state.code, 2);
-// }

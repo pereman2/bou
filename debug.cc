@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <stdlib.h>
+#include <sstream>
+#include <iostream>
 
 #include "darray.h"
 #include "debug.h"
@@ -11,7 +13,8 @@ int ast_num = 0;
 
 void print_ast(Ast_node *root) {
   eval_ast(root);
-  print_ast_node(root);
+  auto representation = ast_node_to_string(root);
+  std::cout << representation << std::endl;
 }
 
 // add identifiers to each ast_node
@@ -19,19 +22,19 @@ void eval_ast(Ast_node *root) {
 }
 
 
-void print_ast_node(Ast_node *root) {
+std::string ast_node_to_string(Ast_node *root) {
   char *type;
+  std::stringstream ss;
   switch (root->type) {
   case BINARY:
-    printf("%d BINARY (%d + %d)\n", ast_num, ast_num+1, ast_num+2);
-    ast_num++;
-    print_ast(get_binary(root)->left);
-    print_ast(get_binary(root)->right);
+    ss << root << " BINARY (" << ast_node_to_string(get_binary(root)->left) << " + " 
+      << ast_node_to_string(get_binary(root)->right) << ")";
     break;
   case LITERAL:
-    printf("%d LITERAL INT %d\n", ast_num, get_literal(root)->value.i);
+    ss << root << " LITERAL " << get_literal(root)->value.i;
     break;
   }
+  return ss.str();
 
 }
 
