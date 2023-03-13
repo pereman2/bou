@@ -47,12 +47,20 @@ static Token *peek() {
   return parser.tokens[parser.ip];
 }
 
+static Token *peek(int offset) {
+  return parser.tokens[parser.ip + offset];
+}
+
 bool match(const char c) {
   return *peek()->start == c;
 }
 
 bool match(const token_type type) {
   return peek()->type == type;
+}
+
+bool match(const token_type type, int offset) {
+  return peek(offset)->type == type;
 }
 
 
@@ -75,24 +83,33 @@ std::string get_identifier_name(Token *token) {
 
 }
 
+Ast_node *create_assign(int op, Token* ident, Token *type) {
+  assert(ident != NULL);
+  assert(type != NULL);
+
+  Ast_node *node = create_ast_node(BINARY);
+  node->expr.binary->op = Ast_binary::DECL;
+  node->expr.binary->left = create_ast_node(IDENTIFIER);
+  identifier(get_binary_left(node))->token = ident;
+
+  std::string ident_name = get_identifier_name(ident);
+  if (op == Ast_binary::DECL) {
+    parser.identifiers.emplace(ident_name, type);
+  }
+  identifier(get_binary_left(node))->type = parser.identifiers[ident_name];
+  return node;
+}
 
 Ast_node *decl() {
-  if (match(T_IDENTIFIER)) {
+  if (match(T_IDENTIFIER) && match(T_COLON, 1)) {
     Token *ident = next_token();
-    if (match(T_COLON)) {
-      next_token();
-      if (match(T_BOOLID) || match(T_FLOATID) || match(T_INTID) || match(T_CHARID)) {
-        Token *type = next_token();
-        if (expect(T_EQUAL)) {
-          Ast_node *node = create_ast_node(BINARY);
-          node->expr.binary->op = Ast_binary::DECL;
-          node->expr.binary->left = create_ast_node(IDENTIFIER);
-          identifier(get_binary_left(node))->token = ident;
-          parser.identifiers.emplace(get_identifier_name(ident), type);
-          identifier(get_binary_left(node))->type = parser.identifiers[get_identifier_name(ident)];
-          get_binary_right(node) = term();
-          return node;
-        }
+    next_token();
+    if (match(T_BOOLID) || match(T_FLOATID) || match(T_INTID) || match(T_CHARID)) {
+      Token *type = next_token();
+      if (expect(T_EQUAL)) {
+        Ast_node *node = create_assign(Ast_binary::DECL, ident, type);
+        get_binary_right(node) = term();
+        return node;
       }
     }
   }
@@ -100,20 +117,17 @@ Ast_node *decl() {
 }
 
 Ast_node *assignment() {
-  if (match(T_IDENTIFIER)) {
+  if (match(T_IDENTIFIER) && match(T_EQUAL, 1)) {
     Token *ident = next_token();
-    if (match(T_EQUAL)) {
-      next_token();
-      Ast_node *node = create_ast_node(BINARY);
-      node->expr.binary->op = Ast_binary::ASSIGN;
-      node->expr.binary->left = create_ast_node(IDENTIFIER);
-      identifier(get_binary_left(node))->token = ident;
-      identifier(get_binary_left(node))->type = parser.identifiers[get_identifier_name(ident)];
-      get_binary_right(node) = term();
-      return node;
+    next_token();
+    auto ident_it = parser.identifiers.find(get_identifier_name(ident));
+    if (ident_it == parser.identifiers.end()) {
+      printf("Error, identifier %s isn't declared\n", get_identifier_name(ident).c_str());
+      exit(1);
     }
-    printf("error identifier\n");
-    exit(1);
+    Ast_node *node = create_assign(Ast_binary::ASSIGN, ident, parser.identifiers[get_identifier_name(ident)]);
+    get_binary_right(node) = term();
+    return node;
   }
   return term();
 }
