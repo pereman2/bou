@@ -34,7 +34,6 @@ struct Ast_binary {
 	Ast_node *left; 
 	Ast_node *right; 
 	enum {ADD, SUB, DECL, ASSIGN, MULTI, DIV} op;
-  bool res_in_register;
 };
 
 

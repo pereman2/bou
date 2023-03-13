@@ -33,7 +33,6 @@ Ast_node* create_ast_node(node_type type) {
       node->expr.binary->left = NULL;
       node->expr.binary->right = NULL;
       node->type = node_type::BINARY;
-      node->expr.binary->res_in_register = false;
       break;
     case IDENTIFIER:
       identifier(node) = (Ast_identifier*) malloc(sizeof(Ast_identifier));
@@ -153,11 +152,9 @@ Ast_node *term() {
       bin->expr.binary->op = Ast_binary::ADD;
     }
     bin->expr.binary->right = factor();
-    bin->expr.binary->res_in_register = true;
 
     added = 1;
   }
-  bin->expr.binary->res_in_register = false;
   if(added) {
     return bin;
   }
@@ -174,18 +171,18 @@ Ast_node *literal() {
   switch(p->type) {
     case T_CHAR:
       l->expr.literal->value.c = *(p->start);
+      get_literal(l)->type = Ast_literal::CHAR;
       break;
     case T_INT:
       l->expr.literal->value.i = (int)atoi(p->start);
+      get_literal(l)->type = Ast_literal::INT;
       break;
-    // case T_FLOAT:
-    //   l->expr.literal->value.f = *(p->start);
-    //   break;
+    case T_FLOAT:
+      get_literal(l)->value.f = (float)atof(p->start);
+      get_literal(l)->type = Ast_literal::FLOAT;
+      break;
     // case T_BOOL:
     //   l->expr.literal->value.b = *(p->start);
-    //   break;
-    // case T_STRING:
-    //   l->expr.literal->value.s = *(p->start);
     //   break;
     default:
       printf("Error parsing literal");

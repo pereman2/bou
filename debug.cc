@@ -31,7 +31,7 @@ std::string ast_node_to_string(Ast_node *root) {
       << ast_node_to_string(get_binary(root)->right) << ")";
     break;
   case LITERAL:
-    ss << root << " LITERAL " << get_literal(root)->value.i;
+    ss << root << " LITERAL " << literal_repr(get_literal(root));
     break;
   case IDENTIFIER:
     std::string name;
@@ -47,6 +47,21 @@ std::string ast_node_to_string(Ast_node *root) {
   }
   return ss.str();
 
+}
+
+std::string literal_repr(Ast_literal *literal) {
+  switch (literal->type) {
+    case Ast_literal::INT:
+      return std::to_string(literal->value.i);
+    case Ast_literal::CHAR:
+      return std::to_string(literal->value.c);
+    case Ast_literal::FLOAT:
+      return std::to_string(literal->value.f);
+    case Ast_literal::BOOL:
+      return std::to_string(literal->value.b);
+    default:
+      return "debug: unknown literal type\n";
+    }
 }
 
 void print_tokens(Token **tokens, int len) {
