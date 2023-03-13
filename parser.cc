@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <assert.h>
+#include <cstring>
 
 #include "ast_node.h"
 #include "token.h"
@@ -181,9 +182,17 @@ Ast_node *literal() {
       get_literal(l)->value.f = (float)atof(p->start);
       get_literal(l)->type = Ast_literal::FLOAT;
       break;
-    // case T_BOOL:
-    //   l->expr.literal->value.b = *(p->start);
-    //   break;
+    case T_BOOL:
+      if(strncmp("true", p->start, 4) == 0) {
+        l->expr.literal->value.b = true;
+      }
+      else if(strncmp("false", p->start, 5) == 0) {
+        l->expr.literal->value.b = false;
+      } else {
+        printf("unexpected bool token %s\n", p->start);
+        exit(1);
+      }
+      break;
     default:
       printf("Error parsing literal");
       print_token(p);

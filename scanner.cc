@@ -120,6 +120,9 @@ Token *create_identifier_token() {
     if (match("loat", 4, len)) {
       return create_token(T_FLOATID, 4);
     }
+    if (match("alse", 4, len)) {
+      return create_token(T_BOOL, 4);
+    }
     break;
   case 'r':
     if (match("eturn", 5, len)) {
@@ -132,6 +135,11 @@ Token *create_identifier_token() {
     }
     if (match("truct", 5, len)) {
       return create_token(T_STRUCT, 0);
+    }
+    break;
+  case 't':
+    if (match("rue", 3, len)) {
+      return create_token(T_BOOL, 3);
     }
     break;
   case 'w':
