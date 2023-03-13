@@ -33,6 +33,17 @@ std::string ast_node_to_string(Ast_node *root) {
   case LITERAL:
     ss << root << " LITERAL " << get_literal(root)->value.i;
     break;
+  case IDENTIFIER:
+    std::string name;
+    char *start = identifier(root)->token->start;
+    char *end = identifier(root)->token->end;
+    while(start < end) {
+      name.push_back(*start);
+      start++;
+    }
+    std::string type(identifier(root)->type->start, identifier(root)->type->end - identifier(root)->type->start);
+    ss << root << " IDENT " << type << " " << name;
+
   }
   return ss.str();
 
@@ -53,6 +64,12 @@ void print_token(Token *t) {
   case T_BOOL:
     type = "T_BOOL";
     break;
+  case T_INTID:
+    type = "T_INTID";
+    break;
+  case T_BOOLID:
+    type = "T_BOOLID";
+    break;
   case T_BREAK:
     type = "T_BREAK";
     break;
@@ -70,6 +87,9 @@ void print_token(Token *t) {
     break;
   case T_CHAR:
     type = "T_CHAR";
+    break;
+  case T_CHARID:
+    type = "T_CHARID";
     break;
   case T_DEF:
     type = "T_DEF";
@@ -91,6 +111,12 @@ void print_token(Token *t) {
     break;
   case T_DOUBLE:
     type = "T_DOUBLE";
+    break;
+  case T_FLOATID:
+    type = "T_FLOATID";
+    break;
+  case T_DOUBLEID:
+    type = "T_DOUBLEID";
     break;
   case T_IDENTIFIER:
     type = "T_IDENTIFIER";

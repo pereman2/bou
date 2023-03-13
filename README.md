@@ -44,24 +44,34 @@ Todo
 Spec
 -----
 
-statements -> block | ifstmt | loopstmt | funcstmt | structstmt 
+```
+statement: block | ifstmt | loopstmt | funcstmt | structstmt 
+block: { statement }
+ifstmt:  if (expr) { statement }
+        | if (expr) { statement } else {statement} 
+funcstmt -> def ident(params): return_type block
+return_type -> literal
 
-literal binary unary group
+; literal binary unary group
 
-expr       -> assignment 
+expr       -> decl 
+decl       -> ident: literal = div
+            | assignment
+ident      -> [a-Z1-9]*
+assignment -> ident = term
+            | term
+div       -> sum (('%'|'*')div)*
+sum        -> literal (('+'|'-')sum)*
+literal -> num 
+        | float_num 
+        | boolean 
+        | char 
+        | string
 
-decl       -> ident + colon + type + (equal + term)? 
+string -> "char*"
+char -> duh
 
-assignment -> ident + equal + term
-
-term       -> factor (('+'|'-')factor)*
-
-factor     -> literal
-
-literal -> num | float_num | boolean | char | string
-
-string -> quote whatever quote
-
+```
 
 Example
 -------
@@ -70,8 +80,11 @@ struct parser {
 }
 
  def get_item(x: int, b: *parser, c: int): int {
-    local: string = 2
+    local: string = "xdfdsfd";
     i: int64 = null j: int64 = 0
+    if (a == b) {
+    } else {
+    }
     for ( i: int = 2; i < local; i++) {
         i = i + 1
         j = 2 

@@ -6,6 +6,17 @@ enum token_type {
   T_STRING,
   T_STRING_LITERAL,
   T_CHAR,
+  T_FLOAT,
+  T_DOUBLE,
+
+  // id of the type
+  T_INTID,
+  T_BOOLID,
+  T_CHARID,
+  T_FLOATID,
+  T_DOUBLEID,
+  T_STRINGID,
+
   T_DEF,
   T_STRUCT,
   T_IF,
@@ -15,8 +26,6 @@ enum token_type {
   T_BREAK,
   T_CONTINUE,
   T_RETURN,
-  T_FLOAT,
-  T_DOUBLE,
   T_IDENTIFIER,
 
   T_LEFT_PAR,

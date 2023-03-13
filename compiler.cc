@@ -21,6 +21,7 @@ void compile(char *src) {
   print_tokens(tokens, len_tokens);
   Ast_node *root = parse(tokens, len_tokens);
 
+  exit(1);
   init_compiler();
   compile_ast(root);
 

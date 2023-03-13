@@ -1,5 +1,8 @@
 #include <cstdlib>
 #include <cstdio>
+#include <assert.h>
+
+#include "ast_node.h"
 #include "token.h"
 #include "debug.h"
 #include "parser.h"
@@ -32,6 +35,10 @@ Ast_node* create_ast_node(node_type type) {
       node->type = node_type::BINARY;
       node->expr.binary->res_in_register = false;
       break;
+    case IDENTIFIER:
+      identifier(node) = (Ast_identifier*) malloc(sizeof(Ast_identifier));
+      identifier(node)->token = NULL;
+      identifier(node)->type = NULL;
   }
   return node;
 }
@@ -40,16 +47,75 @@ static Token *peek() {
   return parser.tokens[parser.ip];
 }
 
+bool match(const char c) {
+  return *peek()->start == c;
+}
+
+bool match(const token_type type) {
+  return peek()->type == type;
+}
+
+
 Token *next_token() {
   return parser.tokens[parser.ip++];
 }
 
-Ast_node *expression() {
-  return term();
+bool expect(const token_type type) {
+  return next_token()->type == type;
 }
 
-bool match(const char c) {
-  return *peek()->start == c;
+Ast_node *expression() {
+  return decl();
+}
+
+std::string get_identifier_name(Token *token) {
+  assert(token->type == T_IDENTIFIER);
+  std::string name(token->start, token->end - token->start);
+  return name;
+
+}
+
+
+Ast_node *decl() {
+  if (match(T_IDENTIFIER)) {
+    Token *ident = next_token();
+    if (match(T_COLON)) {
+      next_token();
+      if (match(T_BOOLID) || match(T_FLOATID) || match(T_INTID) || match(T_CHARID)) {
+        Token *type = next_token();
+        if (expect(T_EQUAL)) {
+          Ast_node *node = create_ast_node(BINARY);
+          node->expr.binary->op = Ast_binary::DECL;
+          node->expr.binary->left = create_ast_node(IDENTIFIER);
+          identifier(get_binary_left(node))->token = ident;
+          parser.identifiers.emplace(get_identifier_name(ident), type);
+          identifier(get_binary_left(node))->type = parser.identifiers[get_identifier_name(ident)];
+          get_binary_right(node) = term();
+          return node;
+        }
+      }
+    }
+  }
+  return assignment();
+}
+
+Ast_node *assignment() {
+  if (match(T_IDENTIFIER)) {
+    Token *ident = next_token();
+    if (match(T_EQUAL)) {
+      next_token();
+      Ast_node *node = create_ast_node(BINARY);
+      node->expr.binary->op = Ast_binary::ASSIGN;
+      node->expr.binary->left = create_ast_node(IDENTIFIER);
+      identifier(get_binary_left(node))->token = ident;
+      identifier(get_binary_left(node))->type = parser.identifiers[get_identifier_name(ident)];
+      get_binary_right(node) = term();
+      return node;
+    }
+    printf("error identifier\n");
+    exit(1);
+  }
+  return term();
 }
 
 
@@ -81,7 +147,6 @@ Ast_node *term() {
   if(added) {
     return bin;
   }
-  free(bin);
   return t;
 }
 

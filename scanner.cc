@@ -78,7 +78,7 @@ Token *create_identifier_token() {
   switch (c) {
   case 'i':
     if (match("nt", 2, len)) {
-      return create_token(T_INT, 2);
+      return create_token(T_INTID, 2);
     }
     if (match("f", 1, len)) {
       return create_token(T_IF, 1);
@@ -86,7 +86,7 @@ Token *create_identifier_token() {
     break;
   case 'b':
     if (match("ool", 3, len)) {
-      return create_token(T_BOOL, 3);
+      return create_token(T_BOOLID, 3);
     }
     if (match("reak", 4, len)) {
       return create_token(T_BREAK, 4);
@@ -94,7 +94,7 @@ Token *create_identifier_token() {
     break;
   case 'c':
     if (match("har", 3, len)) {
-      return create_token(T_CHAR, 0);
+      return create_token(T_CHARID, 0);
     }
     if (match("ontinue", 3, len)) {
       return create_token(T_CONTINUE, 0);
@@ -105,7 +105,7 @@ Token *create_identifier_token() {
       return create_token(T_DEF, 2);
     }
     if (match("ouble", 5, len)) {
-      return create_token(T_DOUBLE, 5);
+      return create_token(T_DOUBLEID, 5);
     }
     break;
   case 'e':
@@ -118,7 +118,7 @@ Token *create_identifier_token() {
       return create_token(T_FOR, 3);
     }
     if (match("loat", 4, len)) {
-      return create_token(T_FLOAT, 4);
+      return create_token(T_FLOATID, 4);
     }
     break;
   case 'r':
@@ -128,7 +128,7 @@ Token *create_identifier_token() {
     break;
   case 's':
     if (match("tring", 5, len)) {
-      return create_token(T_STRING, 5);
+      return create_token(T_STRINGID, 5);
     }
     if (match("truct", 5, len)) {
       return create_token(T_STRUCT, 0);
