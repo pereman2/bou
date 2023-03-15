@@ -26,19 +26,16 @@ Ast_node* create_ast_node(node_type type) {
   node->type = type;
   switch (type) {
     case LITERAL:
-      node->expr.literal = (Ast_literal*) malloc(sizeof(Ast_literal));
       node->type = node_type::LITERAL;
       break;
     case BINARY:
-      node->expr.binary = (Ast_binary*) malloc(sizeof(Ast_binary));
-      node->expr.binary->left = NULL;
-      node->expr.binary->right = NULL;
+      get_binary(node).left = NULL;
+      get_binary(node).right = NULL;
       node->type = node_type::BINARY;
       break;
     case IDENTIFIER:
-      identifier(node) = (Ast_identifier*) malloc(sizeof(Ast_identifier));
-      identifier(node)->token = NULL;
-      identifier(node)->type = NULL;
+      get_identifier(node).token = NULL;
+      get_identifier(node).type = NULL;
   }
   return node;
 }
@@ -88,15 +85,15 @@ Ast_node *create_assign(int op, Token* ident, Token *type) {
   assert(type != NULL);
 
   Ast_node *node = create_ast_node(BINARY);
-  node->expr.binary->op = Ast_binary::DECL;
-  node->expr.binary->left = create_ast_node(IDENTIFIER);
-  identifier(get_binary_left(node))->token = ident;
+  get_binary(node).op = Ast_binary::DECL;
+  get_binary(node).left = create_ast_node(IDENTIFIER);
+  get_identifier(get_binary_left(node)).token = ident;
 
   std::string ident_name = get_identifier_name(ident);
   if (op == Ast_binary::DECL) {
     parser.identifiers.emplace(ident_name, type);
   }
-  identifier(get_binary_left(node))->type = parser.identifiers[ident_name];
+  get_identifier(get_binary_left(node)).type = parser.identifiers[ident_name];
   return node;
 }
 
@@ -146,13 +143,13 @@ Ast_node *term() {
     parser.ip++; // peek successful
     previous = bin;
     bin = create_ast_node(node_type::BINARY);
-    bin->expr.binary->left = previous;
+    get_binary(bin).left = previous;
     if (p->type == T_MINUS) {
-      bin->expr.binary->op = Ast_binary::SUB;
+      get_binary(bin).op = Ast_binary::SUB;
     } else {
-      bin->expr.binary->op = Ast_binary::ADD;
+      get_binary(bin).op = Ast_binary::ADD;
     }
-    bin->expr.binary->right = factor();
+    get_binary(bin).right = factor();
 
     added = 1;
   }
@@ -171,23 +168,23 @@ Ast_node *literal() {
   Token *p = next_token();
   switch(p->type) {
     case T_CHAR:
-      l->expr.literal->value.c = *(p->start);
-      get_literal(l)->type = Ast_literal::CHAR;
+      get_literal(l).value.c = *(p->start);
+      get_literal(l).type = Ast_literal::CHAR;
       break;
     case T_INT:
-      l->expr.literal->value.i = (int)atoi(p->start);
-      get_literal(l)->type = Ast_literal::INT;
+      get_literal(l).value.i = (int)atoi(p->start);
+      get_literal(l).type = Ast_literal::INT;
       break;
     case T_FLOAT:
-      get_literal(l)->value.f = (float)atof(p->start);
-      get_literal(l)->type = Ast_literal::FLOAT;
+      get_literal(l).value.f = (float)atof(p->start);
+      get_literal(l).type = Ast_literal::FLOAT;
       break;
     case T_BOOL:
       if(strncmp("true", p->start, 4) == 0) {
-        l->expr.literal->value.b = true;
+        get_literal(l).value.b = true;
       }
       else if(strncmp("false", p->start, 5) == 0) {
-        l->expr.literal->value.b = false;
+        get_literal(l).value.b = false;
       } else {
         printf("unexpected bool token %s\n", p->start);
         exit(1);

@@ -27,21 +27,21 @@ std::string ast_node_to_string(Ast_node *root) {
   std::stringstream ss;
   switch (root->type) {
   case BINARY:
-    ss << root << " BINARY (" << ast_node_to_string(get_binary(root)->left) << " + " 
-      << ast_node_to_string(get_binary(root)->right) << ")";
+    ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left) << " + " 
+      << ast_node_to_string(get_binary(root).right) << ")";
     break;
   case LITERAL:
-    ss << root << " LITERAL " << literal_repr(get_literal(root));
+    ss << root << " LITERAL " << literal_repr(&get_literal(root));
     break;
   case IDENTIFIER:
     std::string name;
-    char *start = identifier(root)->token->start;
-    char *end = identifier(root)->token->end;
+    char *start = get_identifier(root).token->start;
+    char *end = get_identifier(root).token->end;
     while(start < end) {
       name.push_back(*start);
       start++;
     }
-    std::string type(identifier(root)->type->start, identifier(root)->type->end - identifier(root)->type->start);
+    std::string type(get_identifier(root).type->start, get_identifier(root).type->end - get_identifier(root).type->start);
     ss << root << " IDENT " << type << " " << name;
 
   }

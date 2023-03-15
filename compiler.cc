@@ -78,12 +78,9 @@ void compile_ast(Ast_node *node) {
   }
 }
 
-// (3 + 4) + 5
-// 3 + 4
-// 7 + 5
 void compile_binary_expr(Ast_node *node) {
-  if (get_binary(node)->left->type == node_type::BINARY) {
-    compile_ast(get_binary(node)->left);
+  if (get_binary(node).left->type == node_type::BINARY) {
+    compile_ast(get_binary(node).left);
   } else if (get_binary_left(node)->type == node_type::LITERAL) {
     if (state.register_descriptors[0]) {
       operand dest = {type: operand::REG, size: 32};
@@ -95,20 +92,20 @@ void compile_binary_expr(Ast_node *node) {
       operand dest = {type: operand::REG, size: 32};
       dest.value.reg = 0;
       operand src = {type: operand::IMM, size: 32};
-      src.value.imm = get_binary_left(node)->expr.literal->value.i;
+      src.value.imm = get_binary_left(node)->expr.literal.value.i;
       emit_mov(dest, src);
     }
   }
-  if (get_binary(node)->right->type == node_type::BINARY) {
-    compile_ast(get_binary(node)->right);
-  } else if (get_binary(node)->right->type == node_type::LITERAL) {
+  if (get_binary(node).right->type == node_type::BINARY) {
+    compile_ast(get_binary(node).right);
+  } else if (get_binary(node).right->type == node_type::LITERAL) {
     operand dest = {type: operand::REG, size: 32};
     dest.value.reg = 1;
     operand src = {type: operand::IMM, size: 32};
-    src.value.imm = get_binary_right(node)->expr.literal->value.i;
+    src.value.imm = get_literal(get_binary_right(node)).value.i;
     emit_mov(dest, src);
   }
-  switch((get_binary(node))->op) {
+  switch((get_binary(node)).op) {
   case Ast_binary::ADD:
     {
       // for now let's expect only register in add
