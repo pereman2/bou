@@ -1,11 +1,11 @@
 #include <cstdio>
-#include <stdlib.h>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <stdlib.h>
 
+#include "ast_node.h"
 #include "darray.h"
 #include "debug.h"
-#include "ast_node.h"
 #include "token.h"
 
 // Identifier of the ast_node
@@ -18,50 +18,78 @@ void print_ast(Ast_node *root) {
 }
 
 // add identifiers to each ast_node
-void eval_ast(Ast_node *root) {
-}
-
+void eval_ast(Ast_node *root) {}
 
 std::string ast_node_to_string(Ast_node *root) {
-  char *type;
   std::stringstream ss;
   switch (root->type) {
-  case BINARY:
-    ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left) << " + " 
-      << ast_node_to_string(get_binary(root).right) << ")";
-    break;
-  case LITERAL:
-    ss << root << " LITERAL " << literal_repr(&get_literal(root));
-    break;
-  case IDENTIFIER:
-    std::string name;
-    char *start = get_identifier(root).token->start;
-    char *end = get_identifier(root).token->end;
-    while(start < end) {
-      name.push_back(*start);
-      start++;
-    }
-    std::string type(get_identifier(root).type->start, get_identifier(root).type->end - get_identifier(root).type->start);
-    ss << root << " IDENT " << type << " " << name;
-
+    case EXPRESSION:
+      return ast_expression_to_string(root);
+    case STATEMENT:
+      return ast_statement_to_string(root);
   }
   return ss.str();
+}
 
+std::string ast_expression_to_string(Ast_node *root) {
+  std::stringstream ss;
+  switch(root->value.expression.type) {
+    case BINARY:
+      ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left)
+        << " + " << ast_node_to_string(get_binary(root).right) << ")";
+      break;
+    case LITERAL:
+      ss << root << " LITERAL " << literal_repr(&get_literal(root));
+      break;
+    case IDENTIFIER:
+      std::string name;
+      char *start = get_identifier(root).token->start;
+      char *end = get_identifier(root).token->end;
+      while (start < end) {
+        name.push_back(*start);
+        start++;
+      }
+      std::string type(get_identifier(root).type->start,
+          get_identifier(root).type->end -
+          get_identifier(root).type->start);
+      ss << root << " IDENT " << type << " " << name;
+      break;
+  }
+  return ss.str();
+}
+
+std::string ast_statement_to_string(Ast_node *root) {
+  std::stringstream ss;
+  switch(root->value.statement.type) {
+    case BLOCK: {
+                  std::string block_name("block");
+                  ss << "@" << block_name << "{\n";
+                  for (int i = 0;
+                      i < darray_length(&get_block(root).statements, sizeof(Ast_node));
+                      i++) {
+                    Ast_node* node = (Ast_node*)darray_get(&get_block(root).statements, sizeof(Ast_node), i);
+                    ss << ast_node_to_string(node);
+                    ss << "\n";
+                  }
+                  ss << "\n}\n";
+                }
+  }
+  return ss.str();
 }
 
 std::string literal_repr(AstLiteral *literal) {
   switch (literal->type) {
-    case AstLiteral::INT:
-      return std::to_string(literal->value.i);
-    case AstLiteral::CHAR:
-      return std::to_string(literal->value.c);
-    case AstLiteral::FLOAT:
-      return std::to_string(literal->value.f);
-    case AstLiteral::BOOL:
-      return std::to_string(literal->value.b);
-    default:
-      return "debug: unknown literal type\n";
-    }
+  case AstLiteral::INT:
+    return std::to_string(literal->value.i);
+  case AstLiteral::CHAR:
+    return std::to_string(literal->value.c);
+  case AstLiteral::FLOAT:
+    return std::to_string(literal->value.f);
+  case AstLiteral::BOOL:
+    return std::to_string(literal->value.b);
+  default:
+    return "debug: unknown literal type\n";
+  }
 }
 
 void print_tokens(Token **tokens, int len) {
@@ -225,7 +253,6 @@ void print_token(Token *t) {
          (int)(t->end - t->start), t->start, t->line, t->start);
 }
 
-
 void dump_darray(darray *da) {
   for (int i = 0; i < da->count; i++) {
     printf("0x%02X ", (unsigned char)da->src[i]);
@@ -235,4 +262,3 @@ void dump_darray(darray *da) {
     }
   }
 }
-

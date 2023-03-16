@@ -92,7 +92,7 @@ void compile_binary_expr(Ast_node *node) {
       operand dest = {type: operand::REG, size: 32};
       dest.value.reg = 0;
       operand src = {type: operand::IMM, size: 32};
-      src.value.imm = get_binary_left(node)->expr.literal.value.i;
+      src.value.imm = get_literal(get_binary_left(node)).value.i;
       emit_mov(dest, src);
     }
   }

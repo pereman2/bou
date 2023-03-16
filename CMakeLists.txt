@@ -25,5 +25,5 @@ add_executable(bou
 
 add_executable(test
   test_darray.cc
-  ${sources}
+  darray.cc
 	)

@@ -20,6 +20,8 @@ void print_token(Token *t);
 void print_ast(Ast_node* root);
 void eval_ast(Ast_node* root);
 std::string ast_node_to_string(Ast_node* root);
+std::string ast_statement_to_string(Ast_node *root);
+std::string ast_expression_to_string(Ast_node *root);
 void print_tokens(Token **tokens, int len);
 std::string literal_repr(AstLiteral *literal);
 void dump_darray(darray *da);

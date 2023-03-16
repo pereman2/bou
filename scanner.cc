@@ -295,6 +295,8 @@ Token *scan_token() {
     break;
   case ' ':
     return create_token(T_SPACE, 0);
+  case EOF:
+    return create_token(T_EOF, 0);
   default:
     break;
   }
