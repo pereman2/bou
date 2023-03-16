@@ -15,6 +15,7 @@ struct Parser{
 
 Ast_node* parse(Token **tokens, int ntoken);
 Ast_node* create_ast_node(node_type type);
+
 Ast_node* expression();
 
 Ast_node *decl();

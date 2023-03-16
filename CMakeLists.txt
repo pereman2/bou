@@ -8,14 +8,22 @@ project(Bou
 	VERSION 0.0.1
 	LANGUAGES CXX C ASM)
 
-# add the executable
-add_executable(bou
+set(sources 
 	ast_node.cc
-	bou.cc
 	compiler.cc
 	darray.cc
 	debug.cc
 	elf.cc
 	parser.cc
 	scanner.cc
+  )
+# add the executable
+add_executable(bou
+	bou.cc
+  ${sources}
+  )
+
+add_executable(test
+  test_darray.cc
+  ${sources}
 	)
