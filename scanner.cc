@@ -181,9 +181,7 @@ Token *create_string_token() {
 // - go lexer with concurrency
 //   https://www.youtube.com/watch?v=HxaD_trXwRE
 
-int get_tokens_len() {
-  return scanner.token_count;
-}
+int get_tokens_len() { return scanner.token_count; }
 
 void append_token(Token *token) {
   if (scanner.token_count >= scanner.token_capacity) {

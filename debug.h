@@ -21,6 +21,6 @@ void print_ast(Ast_node* root);
 void eval_ast(Ast_node* root);
 std::string ast_node_to_string(Ast_node* root);
 void print_tokens(Token **tokens, int len);
-std::string literal_repr(Ast_literal *literal);
+std::string literal_repr(AstLiteral *literal);
 void dump_darray(darray *da);
 void dump_darray(darray *da);

@@ -96,9 +96,9 @@ int darray_remove(darray *da, size_t size, int i) {
   if (i >= darray_length(da, size)) {
     return ENOENT;
   }
-  size_t left = darray_length(da, size) - i - 1; 
-  if(left) {
-    memcpy(da->src + (size * i), da->src + (size * (i+1)), left * size);
+  size_t left = darray_length(da, size) - i - 1;
+  if (left) {
+    memcpy(da->src + (size * i), da->src + (size * (i + 1)), left * size);
   }
   da->count -= size;
   return 0;

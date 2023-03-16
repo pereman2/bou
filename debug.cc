@@ -49,15 +49,15 @@ std::string ast_node_to_string(Ast_node *root) {
 
 }
 
-std::string literal_repr(Ast_literal *literal) {
+std::string literal_repr(AstLiteral *literal) {
   switch (literal->type) {
-    case Ast_literal::INT:
+    case AstLiteral::INT:
       return std::to_string(literal->value.i);
-    case Ast_literal::CHAR:
+    case AstLiteral::CHAR:
       return std::to_string(literal->value.c);
-    case Ast_literal::FLOAT:
+    case AstLiteral::FLOAT:
       return std::to_string(literal->value.f);
-    case Ast_literal::BOOL:
+    case AstLiteral::BOOL:
       return std::to_string(literal->value.b);
     default:
       return "debug: unknown literal type\n";

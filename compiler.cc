@@ -106,7 +106,7 @@ void compile_binary_expr(Ast_node *node) {
     emit_mov(dest, src);
   }
   switch((get_binary(node)).op) {
-  case Ast_binary::ADD:
+  case AstBinary::ADD:
     {
       // for now let's expect only register in add
       operand dest = {type: operand::REG, size: 32};
@@ -116,7 +116,7 @@ void compile_binary_expr(Ast_node *node) {
       emit_add(dest, src);
     }
     break;
-  case Ast_binary::SUB:
+  case AstBinary::SUB:
     break;
   }
   state.register_descriptors[0] = 1;

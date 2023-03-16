@@ -10,30 +10,22 @@
 
 #define get_identifier(node) node->expr.identifier
 
-typedef struct Ast_node Ast_node; 
-typedef struct Ast_binary Ast_binary; 
-typedef struct Ast_literal Ast_literal; 
-typedef struct Ast_identifier Ast_identifier; 
+typedef struct Ast_node Ast_node;
 
-typedef enum {
-	BINARY,
-	LITERAL,
-  IDENTIFIER
-} node_type;
+typedef enum { BINARY, LITERAL, IDENTIFIER } node_type;
 
-struct Ast_binary {
-	Ast_node *left; 
-	Ast_node *right; 
-	enum {ADD, SUB, DECL, ASSIGN, MULTI, DIV} op;
+struct AstBinary {
+  Ast_node *left;
+  Ast_node *right;
+  enum { ADD, SUB, DECL, ASSIGN, MULTI, DIV } op;
 };
 
-
-struct Ast_identifier {
+struct AstIdentifier {
   Token *token;
   Token *type;
 };
 
-struct Ast_literal {
+struct AstLiteral {
   enum {
     INT,
     CHAR,
@@ -41,20 +33,19 @@ struct Ast_literal {
     BOOL,
   } type;
 
-	union {
-		int i;
-		char c;
-		bool b;
-		float f;
-	} value;
+  union {
+    int i;
+    char c;
+    bool b;
+    float f;
+  } value;
 };
 
 struct Ast_node {
-	node_type type;
-	union {
-		Ast_binary binary;
-		Ast_literal literal;
-		Ast_identifier identifier;
-	} expr;
+  node_type type;
+  union {
+    AstBinary binary;
+    AstLiteral literal;
+    AstIdentifier identifier;
+  } expr;
 };
-
