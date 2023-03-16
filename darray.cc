@@ -1,5 +1,6 @@
 #include "darray.h"
 #include "util.h"
+#include <asm-generic/errno-base.h>
 #include <cassert>
 #include <cstdarg>
 #include <cstddef>
@@ -89,4 +90,16 @@ void darray_reserve(darray *da, size_t size, size_t number) {
   size_t bytes = size * number;
   darray_grow(da, bytes);
   da->count += bytes;
+}
+
+int darray_remove(darray *da, size_t size, int i) {
+  if (i >= darray_length(da, size)) {
+    return ENOENT;
+  }
+  size_t left = darray_length(da, size) - i - 1; 
+  if(left) {
+    memcpy(da->src + (size * i), da->src + (size * (i+1)), left * size);
+  }
+  da->count -= size;
+  return 0;
 }

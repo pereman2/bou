@@ -29,6 +29,7 @@ void *darray_get(darray *da, size_t size, int i);
 void darray_push(darray *da, size_t size, void* value);
 size_t darray_length(darray *da, size_t size);
 void darray_reserve(darray *da, size_t size, size_t number);
+int darray_remove(darray *da, size_t size, int i);
 
 /* raw functions */
 void push_replicated_byte(darray *da, int num, int byte);

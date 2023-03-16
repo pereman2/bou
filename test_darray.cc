@@ -9,7 +9,7 @@ struct Foo {
 
 #define TEST(fn, name)                                                         \
   {                                                                            \
-    printf("\033[36mRunning test::%-20s %-50s ...\033[36m ", __FILE_NAME__, name);                                \
+    printf("\033[36mRunning test::%s => %-50s ...\033[36m ", __FILE_NAME__, name);                                \
     fflush(stdout);\
     fn();                                                                      \
     printf("\033[32mOK\033\n");                                \
@@ -67,8 +67,32 @@ void test_reserve() {
   assert(darray_length(&da, sizeof(Foo)) == size);
 }
 
+void test_remove() {
+  darray da;
+  init_darray(&da);
+  Foo foo;
+  foo.a = 1;
+  foo.b = 2;
+  size_t size = 1 << 8;
+  for (int i = 0; i < size; i++) {
+    foo.a = i;
+    darray_push((&da), sizeof(Foo), &foo);
+  }
+
+  assert(darray_length(&da, sizeof(Foo)) == size);
+
+  int i = 40;
+  Foo* res = (Foo*)darray_get(&da, sizeof(Foo), i);
+  assert(res->a == i);
+
+  assert(darray_remove(&da, sizeof(Foo), i) == 0);
+  assert(res->a == i+1);
+}
+
+
 int main() {
   TEST(test_simple, "simple");
   TEST(test_length, "length");
   TEST(test_reserve, "reserve");
+  TEST(test_remove, "remove");
 }
