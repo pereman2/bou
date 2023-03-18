@@ -11,6 +11,8 @@
 
 #define get_identifier(node) node->value.expression.expr.identifier
 #define get_block(node) node->value.statement.value.block
+#define get_if(node) node->value.statement.value.ifs
+#define get_func(node) node->value.statement.value.func
 
 #define get_expression(node) node->value.expression
 #define get_statement(node) node->value.statement
@@ -19,13 +21,19 @@ typedef struct Ast_node Ast_node;
 
 typedef enum { 
   STATEMENT, EXPRESSION ,
-  BINARY, LITERAL, IDENTIFIER ,
-  BLOCK, STATEMENT_EXPRESSION,
+
+  // types of expressions
+  BINARY, LITERAL, IDENTIFIER,
+
+  // types of statements
+  BLOCK, IF, FUNC
 } node_type;
 
 struct AstBinary {
   Ast_node *left;
   Ast_node *right;
+  // TODO: declr and assign should be a statement
+  // expression resolves to a value
   enum { ADD, SUB, DECL, ASSIGN, MULTI, DIV } op;
 };
 
@@ -50,6 +58,12 @@ struct AstLiteral {
   } value;
 };
 
+struct AstParameter {
+  Token token;
+  Token type;
+};
+
+
 struct AstExpression {
   node_type type;
   union {
@@ -63,11 +77,26 @@ struct AstBlock {
   darray statements;
 };
 
+struct AstFunc {
+  char *name;
+  darray parameters;
+  Token return_type;
+};
+
+struct AstIf {
+  Ast_node *if_block;
+  Ast_node *else_block;
+  Ast_node *condition;
+  darray parameters;
+};
+
 struct AstStatement {
   node_type type;
   union {
     AstExpression expression;
     AstBlock block;
+    AstIf ifs;
+    AstFunc func;
     // blocks,if,loop...
   } value;
 };

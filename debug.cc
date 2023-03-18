@@ -62,18 +62,36 @@ std::string ast_statement_to_string(Ast_node *root) {
   std::stringstream ss;
   switch(root->value.statement.type) {
     case BLOCK: {
-                  std::string block_name("block");
-                  ss << "@" << block_name << "{\n";
-                  for (int i = 0;
-                      i < darray_length(&get_block(root).statements, sizeof(Ast_node));
-                      i++) {
-                    Ast_node* node = (Ast_node*)darray_get(&get_block(root).statements, sizeof(Ast_node), i);
-                    ss << ast_node_to_string(node);
-                    ss << "\n";
+                  ss << ast_block_to_str(&get_block(root));
+                  break;
+                }
+    case IF: {
+                  ss << "if (\n";
+                  ss << ast_node_to_string(get_if(root).condition);
+                  ss << "\n){\n";
+                  ss << ast_block_to_str(&get_block(get_if(root).if_block));
+                  if (get_if(root).else_block != NULL) {
+                    ss << "\nelse {\n";
+                    ss << ast_block_to_str(&get_block(get_if(root).else_block));
                   }
-                  ss << "\n}\n";
+                  break;
                 }
   }
+  return ss.str();
+}
+
+std::string ast_block_to_str(AstBlock *block) {
+  std::stringstream ss;
+  std::string block_name("block");
+  ss << "@" << block_name << "{\n";
+  for (int i = 0;
+      i < darray_length(&block->statements, sizeof(Ast_node));
+      i++) {
+    Ast_node* node = (Ast_node*)darray_get(&block->statements, sizeof(Ast_node), i);
+    ss << ast_node_to_string(node);
+    ss << "\n";
+  }
+  ss << "}\n";
   return ss.str();
 }
 

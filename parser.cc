@@ -45,6 +45,17 @@ Ast_node *create_ast_node(node_type type) {
     node->type = node_type::STATEMENT;
     get_statement(node).type = node_type::BLOCK;
     break;
+  case IF:
+    node->type = node_type::STATEMENT;
+    get_statement(node).type = node_type::IF;
+    get_if(node).if_block = NULL;
+    get_if(node).else_block = NULL;
+    break;
+  case FUNC:
+    init_darray(&get_if(node).parameters);
+    node->type = node_type::STATEMENT;
+    get_statement(node).type = node_type::FUNC;
+    break;
   }
   return node;
 }
@@ -65,17 +76,37 @@ Token *next_token() { return parser.tokens[parser.ip++]; }
 
 bool expect(const token_type type) { return next_token()->type == type; }
 
+AstParameter get_ast_parameter() {
+  AstParameter param;
+  if(match(T_IDENTIFIER, 0) && match(T_COLON, 1) && is_type_id(2)) {
+    param.token = *peek();
+    next_token();
+    next_token();
+    param.type = *peek();
+    return param;
+  }
+  printf("not a parameter\n");
+  exit(1);
+}
+
 Ast_node *statement() {
   switch(peek()->type) {
     case T_LEFT_BRACE:
       {
+        return parse_block();
+      }
+    case T_IF:
+      {
         next_token();
-        Ast_node *node = create_ast_node(node_type::BLOCK);
-        while (!match(T_RIGHT_BRACE) && !match(T_EOF)) {
-          Ast_node *stmt = statement();
-          darray_push(&get_block(node).statements, sizeof(Ast_node), (void*)stmt);
-        };
-        expect(T_RIGHT_BRACE);
+        Ast_node *node = create_ast_node(node_type::IF);
+        expect(T_LEFT_PAR);
+        get_if(node).condition = expression(false);
+        expect(T_RIGHT_PAR);
+        get_if(node).if_block = parse_block();
+        if (match(T_ELSE)) {
+          next_token();
+          get_if(node).else_block = parse_block();
+        }
         return node;
       }
     default:
@@ -84,9 +115,23 @@ Ast_node *statement() {
       }
   }
 }
-Ast_node *expression() {
+
+Ast_node *parse_block() {
+  assert(expect(T_LEFT_BRACE));
+  Ast_node *node = create_ast_node(node_type::BLOCK);
+  while (!match(T_RIGHT_BRACE) && !match(T_EOF)) {
+    Ast_node *stmt = statement();
+    darray_push(&get_block(node).statements, sizeof(Ast_node), (void*)stmt);
+  };
+  assert(expect(T_RIGHT_BRACE));
+  return node;
+}
+
+Ast_node *expression(bool semicolon) {
   Ast_node *r =  decl(); 
-  assert(expect(T_SEMICOLON));
+  if (semicolon) {
+    assert(expect(T_SEMICOLON));
+  }
   return r;
 }
 
@@ -117,8 +162,7 @@ Ast_node *decl() {
   if (match(T_IDENTIFIER) && match(T_COLON, 1)) {
     Token *ident = next_token();
     next_token();
-    if (match(T_BOOLID) || match(T_FLOATID) || match(T_INTID) ||
-        match(T_CHARID)) {
+    if (is_type_id()) {
       Token *type = next_token();
       if (expect(T_EQUAL)) {
         Ast_node *node = create_assign(AstBinary::DECL, ident, type);
@@ -212,4 +256,9 @@ Ast_node *literal() {
     exit(1);
   }
   return l;
+}
+
+bool is_type_id(int pos) {
+  return match(T_BOOLID, pos) || match(T_FLOATID, pos) || match(T_INTID, pos) ||
+    match(T_CHARID, pos);
 }
