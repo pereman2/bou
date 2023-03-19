@@ -52,9 +52,10 @@ Ast_node *create_ast_node(node_type type) {
     get_if(node).else_block = NULL;
     break;
   case FUNC:
-    init_darray(&get_if(node).parameters);
+    init_darray(&get_func(node).parameters);
     node->type = node_type::STATEMENT;
     get_statement(node).type = node_type::FUNC;
+    get_func(node).block = NULL;
     break;
   }
   return node;
@@ -76,6 +77,16 @@ Token *next_token() { return parser.tokens[parser.ip++]; }
 
 bool expect(const token_type type) { return next_token()->type == type; }
 
+#define assert_parser(expr) \
+  if (!(expr)) { \
+    printf("------- token trace ----\n"); \
+    print_token(peek(0)); \
+    print_token(peek(1)); \
+    print_token(peek(2)); \
+    assert(expr); \
+  } \
+
+
 AstParameter get_ast_parameter() {
   AstParameter param;
   if(match(T_IDENTIFIER, 0) && match(T_COLON, 1) && is_type_id(2)) {
@@ -83,9 +94,13 @@ AstParameter get_ast_parameter() {
     next_token();
     next_token();
     param.type = *peek();
+    next_token();
     return param;
   }
   printf("not a parameter\n");
+  print_token(peek());
+  print_token(peek(1));
+  print_token(peek(2));
   exit(1);
 }
 
@@ -109,6 +124,35 @@ Ast_node *statement() {
         }
         return node;
       }
+     case T_DEF:
+      {
+        next_token();
+        Ast_node *node = create_ast_node(node_type::FUNC);
+        assert_parser(match(T_IDENTIFIER));
+        Token *func_name = peek();
+        size_t name_size = func_name->end - func_name->start;
+        get_func(node).name = (char*)malloc(name_size);
+        memcpy(get_func(node).name, func_name->start, name_size);
+        next_token();
+        assert_parser(expect(T_LEFT_PAR));
+
+        while(match(T_IDENTIFIER)) {
+          AstParameter param = get_ast_parameter();
+          darray_push(&get_func(node).parameters, sizeof(AstParameter), &param);
+          if (match(T_COMMA)) {
+            next_token();
+          }
+        }
+        assert_parser(expect(T_RIGHT_PAR));
+        assert_parser(expect(T_COLON));
+        assert_parser(is_type_id());
+        Token *type = peek();
+        copy_token(&get_func(node).return_type, type);
+        next_token();
+
+        get_func(node).block = parse_block();
+        return node;
+      }
     default:
       {
         return expression();
@@ -117,33 +161,33 @@ Ast_node *statement() {
 }
 
 Ast_node *parse_block() {
-  assert(expect(T_LEFT_BRACE));
+  assert_parser(expect(T_LEFT_BRACE));
   Ast_node *node = create_ast_node(node_type::BLOCK);
   while (!match(T_RIGHT_BRACE) && !match(T_EOF)) {
     Ast_node *stmt = statement();
     darray_push(&get_block(node).statements, sizeof(Ast_node), (void*)stmt);
   };
-  assert(expect(T_RIGHT_BRACE));
+  assert_parser(expect(T_RIGHT_BRACE));
   return node;
 }
 
 Ast_node *expression(bool semicolon) {
   Ast_node *r =  decl(); 
   if (semicolon) {
-    assert(expect(T_SEMICOLON));
+    assert_parser(expect(T_SEMICOLON));
   }
   return r;
 }
 
 std::string get_identifier_name(Token *token) {
-  assert(token->type == T_IDENTIFIER);
+  assert_parser(token->type == T_IDENTIFIER);
   std::string name(token->start, token->end - token->start);
   return name;
 }
 
 Ast_node *create_assign(int op, Token *ident, Token *type) {
-  assert(ident != NULL);
-  assert(type != NULL);
+  assert_parser(ident != NULL);
+  assert_parser(type != NULL);
 
   Ast_node *node = create_ast_node(BINARY);
   get_binary(node).op = AstBinary::DECL;

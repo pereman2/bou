@@ -32,3 +32,4 @@ Ast_node *literal();
 bool is_type_id(int pos = 0);
 
 #endif // PARSER
+

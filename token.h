@@ -1,4 +1,6 @@
 #pragma once
+#include <cstring>
+#include <string>
 enum token_type {
   // TODO: add string literal, module, modulo, and, or, xor, neg ...
   T_INT,
@@ -71,3 +73,12 @@ struct Token {
   char *end;
   int line;
 };
+
+
+inline void copy_token(Token *dst, Token *src) {
+  memcpy(dst, src, sizeof(Token));
+}
+inline std::string token_to_str(Token *dst) {
+  std::string s(dst->start, dst->end - dst->start);
+  return s;
+}

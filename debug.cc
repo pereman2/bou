@@ -62,27 +62,36 @@ std::string ast_statement_to_string(Ast_node *root) {
   std::stringstream ss;
   switch(root->value.statement.type) {
     case BLOCK: {
-                  ss << ast_block_to_str(&get_block(root));
+                  ss << ast_block_to_str(&get_block(root), "");
                   break;
                 }
     case IF: {
                   ss << "if (\n";
                   ss << ast_node_to_string(get_if(root).condition);
                   ss << "\n){\n";
-                  ss << ast_block_to_str(&get_block(get_if(root).if_block));
+                  ss << ast_block_to_str(&get_block(get_if(root).if_block), "");
                   if (get_if(root).else_block != NULL) {
                     ss << "\nelse {\n";
-                    ss << ast_block_to_str(&get_block(get_if(root).else_block));
+                    ss << ast_block_to_str(&get_block(get_if(root).else_block), "");
                   }
                   break;
                 }
+    case FUNC: {
+                 AstFunc* func = &get_func(root);
+                 ss << "params:\n";
+                 for (int i = 0; i < darray_length(&func->parameters, sizeof(AstParameter)); i++) {
+                   AstParameter* param = (AstParameter*)darray_get(&func->parameters, sizeof(AstParameter), i);
+                   ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << "\n";
+                 }
+                 ss << ast_block_to_str(&get_block(func->block), func->name);
+                 break;
+               }
   }
   return ss.str();
 }
 
-std::string ast_block_to_str(AstBlock *block) {
+std::string ast_block_to_str(AstBlock *block, std::string block_name) {
   std::stringstream ss;
-  std::string block_name("block");
   ss << "@" << block_name << "{\n";
   for (int i = 0;
       i < darray_length(&block->statements, sizeof(Ast_node));

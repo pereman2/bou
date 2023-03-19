@@ -101,7 +101,7 @@ Token *create_identifier_token() {
     }
     break;
   case 'd':
-    if (match("ef", 3, len)) {
+    if (match("ef", 2, len)) {
       return create_token(T_DEF, 2);
     }
     if (match("ouble", 5, len)) {

@@ -80,10 +80,12 @@ struct AstBlock {
 struct AstFunc {
   char *name;
   darray parameters;
+  Ast_node* block;
   Token return_type;
 };
 
 struct AstIf {
+  // TODO: change with AstBlocks
   Ast_node *if_block;
   Ast_node *else_block;
   Ast_node *condition;
