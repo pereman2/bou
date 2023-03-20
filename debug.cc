@@ -43,15 +43,15 @@ std::string ast_expression_to_string(Ast_node *root) {
       break;
     case IDENTIFIER:
       std::string name;
-      char *start = get_identifier(root).token->start;
-      char *end = get_identifier(root).token->end;
+      char *start = get_identifier(root).token.start;
+      char *end = get_identifier(root).token.end;
       while (start < end) {
         name.push_back(*start);
         start++;
       }
-      std::string type(get_identifier(root).type->start,
-          get_identifier(root).type->end -
-          get_identifier(root).type->start);
+      std::string type(get_identifier(root).type.start,
+          get_identifier(root).type.end -
+          get_identifier(root).type.start);
       ss << root << " IDENT " << type << " " << name;
       break;
   }
@@ -79,8 +79,8 @@ std::string ast_statement_to_string(Ast_node *root) {
     case FUNC: {
                  AstFunc* func = &get_func(root);
                  ss << "params: ";
-                 for (int i = 0; i < darray_length(&func->parameters, sizeof(AstParameter)); i++) {
-                   AstParameter* param = (AstParameter*)darray_get(&func->parameters, sizeof(AstParameter), i);
+                 for (int i = 0; i < darray_length(&func->parameters, sizeof(AstIdentifier)); i++) {
+                   AstIdentifier* param = (AstIdentifier*)darray_get(&func->parameters, sizeof(AstIdentifier), i);
                    ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << " ";
                  }
                  ss << "\n";

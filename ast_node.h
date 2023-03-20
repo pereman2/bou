@@ -38,8 +38,8 @@ struct AstBinary {
 };
 
 struct AstIdentifier {
-  Token *token;
-  Token *type;
+  Token token;
+  Token type;
 };
 
 struct AstLiteral {
@@ -58,11 +58,6 @@ struct AstLiteral {
   } value;
 };
 
-struct AstParameter {
-  Token token;
-  Token type;
-};
-
 
 struct AstExpression {
   node_type type;
@@ -79,7 +74,7 @@ struct AstBlock {
 
 struct AstFunc {
   char *name;
-  darray parameters;
+  darray parameters; // AstIdentifier
   Ast_node* block;
   Token return_type;
 };

@@ -36,8 +36,6 @@ Ast_node *create_ast_node(node_type type) {
     break;
   case IDENTIFIER:
     node->type = node_type::EXPRESSION;
-    get_identifier(node).token = NULL;
-    get_identifier(node).type = NULL;
     get_expression(node).type = node_type::IDENTIFIER;
     break;
   case BLOCK:
@@ -106,8 +104,8 @@ bool expect(const token_type type) { return next_token()->type == type; }
   } \
 
 
-AstParameter get_ast_parameter() {
-  AstParameter param;
+AstIdentifier get_ast_parameter() {
+  AstIdentifier param;
   if(match(T_IDENTIFIER, 0) && match(T_COLON, 1) && is_type_id(2)) {
     param.token = *peek();
     next_token();
@@ -158,8 +156,8 @@ Ast_node *statement() {
         assert_parser(expect(T_LEFT_PAR));
 
         while(match(T_IDENTIFIER)) {
-          AstParameter param = get_ast_parameter();
-          darray_push(&get_func(node).parameters, sizeof(AstParameter), &param);
+          AstIdentifier param = get_ast_parameter();
+          darray_push(&get_func(node).parameters, sizeof(AstIdentifier), &param);
           if (match(T_COMMA)) {
             next_token();
           }
@@ -213,13 +211,13 @@ Ast_node *create_assign(int op, Token *ident, Token *type) {
   Ast_node *node = create_ast_node(BINARY);
   get_binary(node).op = AstBinary::DECL;
   get_binary(node).left = create_ast_node(IDENTIFIER);
-  get_identifier(get_binary_left(node)).token = ident;
+  copy_token(&get_identifier(get_binary_left(node)).token, ident);
 
   std::string ident_name = get_identifier_name(ident);
   if (op == AstBinary::DECL) {
     parser.identifiers.emplace(ident_name, type);
   }
-  get_identifier(get_binary_left(node)).type = parser.identifiers[ident_name];
+  copy_token(&get_identifier(get_binary_left(node)).type,  parser.identifiers[ident_name]);
   return node;
 }
 
