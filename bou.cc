@@ -14,6 +14,22 @@ void repl() {
   }
 }
 int main(int args, char** argv) {
-  repl();
+  if (args > 1) {
+    char *buffer = 0;
+    int length;
+    FILE *f = fopen (argv[1], "r"); 
+    fseek (f, 0, SEEK_END);
+    length = ftell (f);
+    fseek (f, 0, SEEK_SET);
+    buffer = (char*)malloc ((length+1)*sizeof(char));
+    if (buffer)
+    {
+      fread (buffer, sizeof(char), length, f);
+    }
+    fclose (f);
+    compile(buffer);
+  } else {
+    repl();
+  }
   return 0;
 }

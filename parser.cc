@@ -63,17 +63,36 @@ Ast_node *create_ast_node(node_type type) {
 
 static Token *peek() { return parser.tokens[parser.ip]; }
 
-static Token *peek(int offset) { return parser.tokens[parser.ip + offset]; }
+void ignore_lf() {
+  while (parser.tokens[parser.ip]->type == T_LF) {
+    parser.ip++;
+  }
+}
 
-bool match(const char c) { return *peek()->start == c; }
+static Token *peek(int offset) { 
+  ignore_lf();
+  return parser.tokens[parser.ip + offset]; 
+}
 
-bool match(const token_type type) { return peek()->type == type; }
+bool match(const char c) { 
+  ignore_lf();
+  return *peek()->start == c; 
+}
+
+bool match(const token_type type) { 
+  ignore_lf();
+  return peek()->type == type; 
+}
 
 bool match(const token_type type, int offset) {
+  ignore_lf();
   return peek(offset)->type == type;
 }
 
-Token *next_token() { return parser.tokens[parser.ip++]; }
+Token *next_token() { 
+  ignore_lf();
+  return parser.tokens[parser.ip++]; 
+}
 
 bool expect(const token_type type) { return next_token()->type == type; }
 
@@ -131,8 +150,10 @@ Ast_node *statement() {
         assert_parser(match(T_IDENTIFIER));
         Token *func_name = peek();
         size_t name_size = func_name->end - func_name->start;
-        get_func(node).name = (char*)malloc(name_size);
+        get_func(node).name = (char*)malloc(name_size+1);
         memcpy(get_func(node).name, func_name->start, name_size);
+        get_func(node).name[name_size] = '\0';
+
         next_token();
         assert_parser(expect(T_LEFT_PAR));
 
@@ -247,7 +268,7 @@ Ast_node *term() {
 
   bool added = 0;
   while (match('-') || match('+')) {
-    parser.ip++; // peek successful
+    next_token(); // peek successful
     previous = bin;
     bin = create_ast_node(node_type::BINARY);
     get_binary(bin).left = previous;
@@ -296,7 +317,12 @@ Ast_node *literal() {
     break;
   default:
     printf("Error parsing literal");
-    print_token(p);
+    print_token(peek(-2));
+    print_token(peek(-1));
+    print_token(peek(0));
+    print_token(peek(1));
+    print_token(peek(2));
+    print_token(peek(3));
     exit(1);
   }
   return l;

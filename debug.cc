@@ -78,11 +78,12 @@ std::string ast_statement_to_string(Ast_node *root) {
                 }
     case FUNC: {
                  AstFunc* func = &get_func(root);
-                 ss << "params:\n";
+                 ss << "params: ";
                  for (int i = 0; i < darray_length(&func->parameters, sizeof(AstParameter)); i++) {
                    AstParameter* param = (AstParameter*)darray_get(&func->parameters, sizeof(AstParameter), i);
-                   ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << "\n";
+                   ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << " ";
                  }
+                 ss << "\n";
                  ss << ast_block_to_str(&get_block(func->block), func->name);
                  break;
                }
@@ -92,7 +93,7 @@ std::string ast_statement_to_string(Ast_node *root) {
 
 std::string ast_block_to_str(AstBlock *block, std::string block_name) {
   std::stringstream ss;
-  ss << "@" << block_name << "{\n";
+  ss << "@" << block_name << " {\n";
   for (int i = 0;
       i < darray_length(&block->statements, sizeof(Ast_node));
       i++) {
@@ -120,9 +121,11 @@ std::string literal_repr(AstLiteral *literal) {
 }
 
 void print_tokens(Token **tokens, int len) {
+  printf("----- tokens -------\n");
   for (int i = 0; i < len; i++) {
     print_token(tokens[i]);
   }
+  printf("----- end tokens -------\n\n");
 }
 
 void print_token(Token *t) {
