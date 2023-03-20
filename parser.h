@@ -30,6 +30,7 @@ Ast_node *literal();
 
 
 bool is_type_id(int pos = 0);
+void ast_do_binary_op_save_left(AstLiteral *left, AstLiteral *right);
 
 #endif // PARSER
 

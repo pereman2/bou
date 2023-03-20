@@ -117,14 +117,14 @@ std::string ast_block_to_str(AstBlock *block, std::string block_name) {
 
 std::string literal_repr(AstLiteral *literal) {
   switch (literal->type) {
-  case AstLiteral::INT:
-    return std::to_string(literal->value.i);
-  case AstLiteral::CHAR:
-    return std::to_string(literal->value.c);
-  case AstLiteral::FLOAT:
-    return std::to_string(literal->value.f);
-  case AstLiteral::BOOL:
-    return std::to_string(literal->value.b);
+  case literal_type::INT:
+    return std::to_string(literal->value);
+  case literal_type::CHAR:
+    return std::to_string((char)literal->value);
+  case literal_type::FLOAT:
+    return std::to_string(*(float*)&literal->value);
+  case literal_type::BOOL:
+    return std::to_string((bool)literal->value);
   default:
     return "debug: unknown literal type\n";
   }
@@ -302,3 +302,4 @@ void dump_darray(darray *da) {
     }
   }
 }
+

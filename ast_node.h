@@ -30,12 +30,16 @@ typedef enum {
   BLOCK, IF, FUNC, STRUCT
 } node_type;
 
+enum binary_type {
+  ADD, SUB, DECL, ASSIGN, MULTI, DIV 
+};
+
 struct AstBinary {
   Ast_node *left;
   Ast_node *right;
   // TODO: declr and assign should be a statement
   // expression resolves to a value
-  enum { ADD, SUB, DECL, ASSIGN, MULTI, DIV } op;
+  binary_type op;
 };
 
 struct AstIdentifier {
@@ -43,20 +47,16 @@ struct AstIdentifier {
   Token type;
 };
 
-struct AstLiteral {
-  enum {
+enum literal_type {
     INT,
     CHAR,
     FLOAT,
     BOOL,
-  } type;
+};
 
-  union {
-    int i;
-    char c;
-    bool b;
-    float f;
-  } value;
+struct AstLiteral {
+  literal_type type;
+  int value;
 };
 
 
@@ -112,3 +112,25 @@ struct Ast_node {
     AstStatement statement;
   } value;
 };
+
+#define get_float_from_int(int_value) *(float*)(&int_value)
+#define set_float_to_int(float_value) *(int*)&float_value
+// todo: better naming
+#define ast_do_binary_op_wrap(l, r, op) {\
+  if (l->type == FLOAT || r->type == FLOAT) { \
+    float lhs = get_float_from_int(l->value); \
+    if (l->type != literal_type::FLOAT) { \
+      lhs = (float)l->value; \
+    } \
+    float rhs = get_float_from_int(r->value); \
+    if (r->type != literal_type::FLOAT) { \
+      rhs = (float)r->value; \
+    } \
+    float res = lhs op rhs; \
+    return set_float_to_int(res); \
+  } else { \
+    return l->value op r->value; \
+  } \
+}\
+
+int ast_do_binary_op(AstLiteral *left, AstLiteral *right, binary_type type);

@@ -92,7 +92,7 @@ void compile_binary_expr(Ast_node *node) {
       operand dest = {type: operand::REG, size: 32};
       dest.value.reg = 0;
       operand src = {type: operand::IMM, size: 32};
-      src.value.imm = get_literal(get_binary_left(node)).value.i;
+      src.value.imm = get_literal(get_binary_left(node)).value;
       emit_mov(dest, src);
     }
   }
@@ -102,11 +102,11 @@ void compile_binary_expr(Ast_node *node) {
     operand dest = {type: operand::REG, size: 32};
     dest.value.reg = 1;
     operand src = {type: operand::IMM, size: 32};
-    src.value.imm = get_literal(get_binary_right(node)).value.i;
+    src.value.imm = get_literal(get_binary_right(node)).value;
     emit_mov(dest, src);
   }
   switch((get_binary(node)).op) {
-  case AstBinary::ADD:
+  case binary_type::ADD:
     {
       // for now let's expect only register in add
       operand dest = {type: operand::REG, size: 32};
@@ -116,7 +116,7 @@ void compile_binary_expr(Ast_node *node) {
       emit_add(dest, src);
     }
     break;
-  case AstBinary::SUB:
+  case binary_type::SUB:
     break;
   }
   state.register_descriptors[0] = 1;
