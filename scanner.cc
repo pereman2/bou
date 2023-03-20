@@ -134,7 +134,7 @@ Token *create_identifier_token() {
       return create_token(T_STRINGID, 5);
     }
     if (match("truct", 5, len)) {
-      return create_token(T_STRUCT, 0);
+      return create_token(T_STRUCT, 5);
     }
     break;
   case 't':
@@ -148,8 +148,10 @@ Token *create_identifier_token() {
     }
     break;
   }
-  // TODO:
-  // https://github.com/lotabout/write-a-C-interpreter/blob/master/tutorial/en/3-Lexer.md
+  // identifier can include numeric infixes and suffixes
+  while (is_alpha(*(scanner.ip + len)) || is_numeric(*(scanner.ip + len))) {
+    len++;
+  }
   return create_token(T_IDENTIFIER, len);
 }
 

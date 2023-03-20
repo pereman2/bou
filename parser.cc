@@ -55,6 +55,11 @@ Ast_node *create_ast_node(node_type type) {
     get_statement(node).type = node_type::FUNC;
     get_func(node).block = NULL;
     break;
+  case STRUCT:
+    init_darray(&get_struct(node).parameters);
+    node->type = node_type::STATEMENT;
+    get_statement(node).type = node_type::STRUCT;
+    break;
   }
   return node;
 }
@@ -170,6 +175,31 @@ Ast_node *statement() {
         next_token();
 
         get_func(node).block = parse_block();
+        return node;
+      }
+
+     case T_STRUCT:
+      {
+        next_token();
+        Ast_node *node = create_ast_node(node_type::STRUCT);
+
+        assert_parser(match(T_IDENTIFIER));
+        Token *func_name = peek();
+        size_t name_size = func_name->end - func_name->start;
+        get_struct(node).name = (char*)malloc(name_size+1);
+        memcpy(get_struct(node).name, func_name->start, name_size);
+        get_struct(node).name[name_size] = '\0';
+        next_token();
+        assert_parser(expect(T_LEFT_BRACE));
+
+        while (match(T_IDENTIFIER)) {
+          AstIdentifier id = get_ast_parameter();
+          darray_push(&get_struct(node).parameters, sizeof(AstIdentifier), &id);
+          assert_parser(expect(T_SEMICOLON));
+        }
+
+        assert_parser(expect(T_RIGHT_BRACE));
+
         return node;
       }
     default:

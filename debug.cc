@@ -87,6 +87,16 @@ std::string ast_statement_to_string(Ast_node *root) {
                  ss << ast_block_to_str(&get_block(func->block), func->name);
                  break;
                }
+    case STRUCT: {
+                 AstStruct* structs = &get_struct(root);
+                 ss << "struct @" << structs->name << " {\n";
+                 for (int i = 0; i < darray_length(&structs->parameters, sizeof(AstIdentifier)); i++) {
+                   AstIdentifier* param = (AstIdentifier*)darray_get(&structs->parameters, sizeof(AstIdentifier), i);
+                   ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << ";\n";
+                 }
+                 ss << "}\n";
+                 break;
+               }
   }
   return ss.str();
 }

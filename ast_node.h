@@ -13,6 +13,7 @@
 #define get_block(node) node->value.statement.value.block
 #define get_if(node) node->value.statement.value.ifs
 #define get_func(node) node->value.statement.value.func
+#define get_struct(node) node->value.statement.value.structs
 
 #define get_expression(node) node->value.expression
 #define get_statement(node) node->value.statement
@@ -26,7 +27,7 @@ typedef enum {
   BINARY, LITERAL, IDENTIFIER,
 
   // types of statements
-  BLOCK, IF, FUNC
+  BLOCK, IF, FUNC, STRUCT
 } node_type;
 
 struct AstBinary {
@@ -72,6 +73,11 @@ struct AstBlock {
   darray statements;
 };
 
+struct AstStruct {
+  char *name;
+  darray parameters; // AstIdentifier
+};
+
 struct AstFunc {
   char *name;
   darray parameters; // AstIdentifier
@@ -94,6 +100,7 @@ struct AstStatement {
     AstBlock block;
     AstIf ifs;
     AstFunc func;
+    AstStruct structs;
     // blocks,if,loop...
   } value;
 };
