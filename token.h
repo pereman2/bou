@@ -60,8 +60,9 @@ enum token_type {
   // this should be useful because:
   // v: int = 312432 4234
   // should fail
-  // pasrser should have something like semicolon if we want more than one expresion in the same line
-  T_SPACE, 
+  // pasrser should have something like semicolon if we want more than one
+  // expresion in the same line
+  T_SPACE,
 
   T_ERROR,
   T_EOF,
@@ -69,16 +70,13 @@ enum token_type {
 
 struct Token {
   token_type type;
-  char *start;
-  char *end;
+  char* start;
+  char* end;
   int line;
 };
 
-
-inline void copy_token(Token *dst, Token *src) {
-  memcpy(dst, src, sizeof(Token));
-}
-inline std::string token_to_str(Token *dst) {
+inline void copy_token(Token* dst, Token* src) { memcpy(dst, src, sizeof(Token)); }
+inline std::string token_to_str(Token* dst) {
   std::string s(dst->start, dst->end - dst->start);
   return s;
 }

@@ -1,18 +1,19 @@
-#include "darray.h"
 #include <cassert>
 #include <cstdio>
+
+#include "darray.h"
 
 struct Foo {
   int a;
   bool b;
 };
 
-#define TEST(fn, name)                                                         \
-  {                                                                            \
-    printf("\033[36mRunning test::%s => %-50s ...\033[36m ", __FILE_NAME__, name);                                \
-    fflush(stdout);\
-    fn();                                                                      \
-    printf("\033[32mOK\033\n");                                \
+#define TEST(fn, name)                                                             \
+  {                                                                                \
+    printf("\033[36mRunning test::%s => %-50s ...\033[36m ", __FILE_NAME__, name); \
+    fflush(stdout);                                                                \
+    fn();                                                                          \
+    printf("\033[32mOK\033\n");                                                    \
   }
 
 void test_simple() {
@@ -30,8 +31,8 @@ void test_simple() {
 
   darray_get((&da), sizeof(Foo), 0);
 
-  Foo *foo_1 = (Foo *)darray_get((&da), sizeof(Foo), 0);
-  Foo *foo2_1 = (Foo *)darray_get((&da), sizeof(Foo), 1);
+  Foo* foo_1 = (Foo*)darray_get((&da), sizeof(Foo), 0);
+  Foo* foo2_1 = (Foo*)darray_get((&da), sizeof(Foo), 1);
 
   assert(foo.a == foo_1->a);
   assert(foo.b == foo_1->b);
@@ -53,7 +54,6 @@ void test_length() {
 
   assert(darray_length(&da, sizeof(Foo)) == size);
 }
-
 
 void test_reserve() {
   darray da;
@@ -86,9 +86,8 @@ void test_remove() {
   assert(res->a == i);
 
   assert(darray_remove(&da, sizeof(Foo), i) == 0);
-  assert(res->a == i+1);
+  assert(res->a == i + 1);
 }
-
 
 int main() {
   TEST(test_simple, "simple");

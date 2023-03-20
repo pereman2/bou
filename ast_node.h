@@ -20,23 +20,27 @@
 
 typedef struct Ast_node Ast_node;
 
-typedef enum { 
-  STATEMENT, EXPRESSION ,
+typedef enum {
+  STATEMENT,
+  EXPRESSION,
 
   // types of expressions
-  BINARY, LITERAL, IDENTIFIER,
+  BINARY,
+  LITERAL,
+  IDENTIFIER,
 
   // types of statements
-  BLOCK, IF, FUNC, STRUCT
+  BLOCK,
+  IF,
+  FUNC,
+  STRUCT
 } node_type;
 
-enum binary_type {
-  ADD, SUB, DECL, ASSIGN, MULTI, DIV 
-};
+enum binary_type { ADD, SUB, DECL, ASSIGN, MULTI, DIV };
 
 struct AstBinary {
-  Ast_node *left;
-  Ast_node *right;
+  Ast_node* left;
+  Ast_node* right;
   // TODO: declr and assign should be a statement
   // expression resolves to a value
   binary_type op;
@@ -48,17 +52,16 @@ struct AstIdentifier {
 };
 
 enum literal_type {
-    INT,
-    CHAR,
-    FLOAT,
-    BOOL,
+  INT,
+  CHAR,
+  FLOAT,
+  BOOL,
 };
 
 struct AstLiteral {
   literal_type type;
   int value;
 };
-
 
 struct AstExpression {
   node_type type;
@@ -74,22 +77,22 @@ struct AstBlock {
 };
 
 struct AstStruct {
-  char *name;
-  darray parameters; // AstIdentifier
+  char* name;
+  darray parameters;  // AstIdentifier
 };
 
 struct AstFunc {
-  char *name;
-  darray parameters; // AstIdentifier
+  char* name;
+  darray parameters;  // AstIdentifier
   Ast_node* block;
   Token return_type;
 };
 
 struct AstIf {
   // TODO: change with AstBlocks
-  Ast_node *if_block;
-  Ast_node *else_block;
-  Ast_node *condition;
+  Ast_node* if_block;
+  Ast_node* else_block;
+  Ast_node* condition;
   darray parameters;
 };
 
@@ -116,21 +119,22 @@ struct Ast_node {
 #define get_float_from_int(int_value) *(float*)(&int_value)
 #define set_float_to_int(float_value) *(int*)&float_value
 // todo: better naming
-#define ast_do_binary_op_wrap(l, r, op) {\
-  if (l->type == FLOAT || r->type == FLOAT) { \
-    float lhs = get_float_from_int(l->value); \
-    if (l->type != literal_type::FLOAT) { \
-      lhs = (float)l->value; \
-    } \
-    float rhs = get_float_from_int(r->value); \
-    if (r->type != literal_type::FLOAT) { \
-      rhs = (float)r->value; \
-    } \
-    float res = lhs op rhs; \
-    return set_float_to_int(res); \
-  } else { \
-    return l->value op r->value; \
-  } \
-}\
+#define ast_do_binary_op_wrap(l, r, op)         \
+  {                                             \
+    if (l->type == FLOAT || r->type == FLOAT) { \
+      float lhs = get_float_from_int(l->value); \
+      if (l->type != literal_type::FLOAT) {     \
+        lhs = (float)l->value;                  \
+      }                                         \
+      float rhs = get_float_from_int(r->value); \
+      if (r->type != literal_type::FLOAT) {     \
+        rhs = (float)r->value;                  \
+      }                                         \
+      float res = lhs op rhs;                   \
+      return set_float_to_int(res);             \
+    } else {                                    \
+      return l->value op r->value;              \
+    }                                           \
+  }
 
-int ast_do_binary_op(AstLiteral *left, AstLiteral *right, binary_type type);
+int ast_do_binary_op(AstLiteral* left, AstLiteral* right, binary_type type);

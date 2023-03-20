@@ -1,70 +1,72 @@
+#include "parser.h"
+
 #include <assert.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
 #include "ast_node.h"
 #include "debug.h"
-#include "parser.h"
 #include "token.h"
 
 Parser parser;
 
-Ast_node *parse(Token **tokens, int ntokens) {
+Ast_node* parse(Token** tokens, int ntokens) {
   // for now only one expression
   parser.tokens = tokens;
   parser.ntokens = ntokens;
   parser.ip = 0;
-  Ast_node *ast = statement();
+  Ast_node* ast = statement();
   print_ast(ast);
   return ast;
 }
 
-Ast_node *create_ast_node(node_type type) {
-  Ast_node *node = (Ast_node *)malloc(sizeof(Ast_node));
+Ast_node* create_ast_node(node_type type) {
+  Ast_node* node = (Ast_node*)malloc(sizeof(Ast_node));
   node->type = type;
   switch (type) {
-  case LITERAL:
-    node->type = node_type::EXPRESSION;
-    get_expression(node).type = node_type::LITERAL;
-    break;
-  case BINARY:
-    node->type = node_type::EXPRESSION;
-    get_binary(node).left = NULL;
-    get_binary(node).right = NULL;
-    get_expression(node).type = node_type::BINARY;
-    break;
-  case IDENTIFIER:
-    node->type = node_type::EXPRESSION;
-    get_expression(node).type = node_type::IDENTIFIER;
-    break;
-  case BLOCK:
-    init_darray(&get_block(node).statements);
-    node->type = node_type::STATEMENT;
-    get_statement(node).type = node_type::BLOCK;
-    break;
-  case IF:
-    node->type = node_type::STATEMENT;
-    get_statement(node).type = node_type::IF;
-    get_if(node).if_block = NULL;
-    get_if(node).else_block = NULL;
-    break;
-  case FUNC:
-    init_darray(&get_func(node).parameters);
-    node->type = node_type::STATEMENT;
-    get_statement(node).type = node_type::FUNC;
-    get_func(node).block = NULL;
-    break;
-  case STRUCT:
-    init_darray(&get_struct(node).parameters);
-    node->type = node_type::STATEMENT;
-    get_statement(node).type = node_type::STRUCT;
-    break;
+    case LITERAL:
+      node->type = node_type::EXPRESSION;
+      get_expression(node).type = node_type::LITERAL;
+      break;
+    case BINARY:
+      node->type = node_type::EXPRESSION;
+      get_binary(node).left = NULL;
+      get_binary(node).right = NULL;
+      get_expression(node).type = node_type::BINARY;
+      break;
+    case IDENTIFIER:
+      node->type = node_type::EXPRESSION;
+      get_expression(node).type = node_type::IDENTIFIER;
+      break;
+    case BLOCK:
+      init_darray(&get_block(node).statements);
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::BLOCK;
+      break;
+    case IF:
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::IF;
+      get_if(node).if_block = NULL;
+      get_if(node).else_block = NULL;
+      break;
+    case FUNC:
+      init_darray(&get_func(node).parameters);
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::FUNC;
+      get_func(node).block = NULL;
+      break;
+    case STRUCT:
+      init_darray(&get_struct(node).parameters);
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::STRUCT;
+      break;
   }
   return node;
 }
 
-static Token *peek() { return parser.tokens[parser.ip]; }
+static Token* peek() { return parser.tokens[parser.ip]; }
 
 void ignore_lf() {
   while (parser.tokens[parser.ip]->type == T_LF) {
@@ -72,7 +74,7 @@ void ignore_lf() {
   }
 }
 
-static Token *peek(int offset) {
+static Token* peek(int offset) {
   ignore_lf();
   return parser.tokens[parser.ip + offset];
 }
@@ -92,20 +94,20 @@ bool match(const token_type type, int offset) {
   return peek(offset)->type == type;
 }
 
-Token *next_token() {
+Token* next_token() {
   ignore_lf();
   return parser.tokens[parser.ip++];
 }
 
 bool expect(const token_type type) { return next_token()->type == type; }
 
-#define assert_parser(expr)                                                    \
-  if (!(expr)) {                                                               \
-    printf("------- token trace ----\n");                                      \
-    print_token(peek(0));                                                      \
-    print_token(peek(1));                                                      \
-    print_token(peek(2));                                                      \
-    assert(expr);                                                              \
+#define assert_parser(expr)               \
+  if (!(expr)) {                          \
+    printf("------- token trace ----\n"); \
+    print_token(peek(0));                 \
+    print_token(peek(1));                 \
+    print_token(peek(2));                 \
+    assert(expr);                         \
   }
 
 AstIdentifier get_ast_parameter() {
@@ -125,114 +127,114 @@ AstIdentifier get_ast_parameter() {
   exit(1);
 }
 
-Ast_node *statement() {
+Ast_node* statement() {
   switch (peek()->type) {
-  case T_LEFT_BRACE: {
-    return parse_block();
-  }
-  case T_IF: {
-    next_token();
-    Ast_node *node = create_ast_node(node_type::IF);
-    expect(T_LEFT_PAR);
-    get_if(node).condition = expression(false);
-    expect(T_RIGHT_PAR);
-    get_if(node).if_block = parse_block();
-    if (match(T_ELSE)) {
+    case T_LEFT_BRACE: {
+      return parse_block();
+    }
+    case T_IF: {
       next_token();
-      get_if(node).else_block = parse_block();
-    }
-    return node;
-  }
-  case T_DEF: {
-    next_token();
-    Ast_node *node = create_ast_node(node_type::FUNC);
-    assert_parser(match(T_IDENTIFIER));
-    Token *func_name = peek();
-    size_t name_size = func_name->end - func_name->start;
-    get_func(node).name = (char *)malloc(name_size + 1);
-    memcpy(get_func(node).name, func_name->start, name_size);
-    get_func(node).name[name_size] = '\0';
-
-    next_token();
-    assert_parser(expect(T_LEFT_PAR));
-
-    while (match(T_IDENTIFIER)) {
-      AstIdentifier param = get_ast_parameter();
-      darray_push(&get_func(node).parameters, sizeof(AstIdentifier), &param);
-      if (match(T_COMMA)) {
+      Ast_node* node = create_ast_node(node_type::IF);
+      expect(T_LEFT_PAR);
+      get_if(node).condition = expression(false);
+      expect(T_RIGHT_PAR);
+      get_if(node).if_block = parse_block();
+      if (match(T_ELSE)) {
         next_token();
+        get_if(node).else_block = parse_block();
       }
+      return node;
     }
-    assert_parser(expect(T_RIGHT_PAR));
-    assert_parser(expect(T_COLON));
-    assert_parser(is_type_id());
-    Token *type = peek();
-    copy_token(&get_func(node).return_type, type);
-    next_token();
+    case T_DEF: {
+      next_token();
+      Ast_node* node = create_ast_node(node_type::FUNC);
+      assert_parser(match(T_IDENTIFIER));
+      Token* func_name = peek();
+      size_t name_size = func_name->end - func_name->start;
+      get_func(node).name = (char*)malloc(name_size + 1);
+      memcpy(get_func(node).name, func_name->start, name_size);
+      get_func(node).name[name_size] = '\0';
 
-    get_func(node).block = parse_block();
-    return node;
-  }
+      next_token();
+      assert_parser(expect(T_LEFT_PAR));
 
-  case T_STRUCT: {
-    next_token();
-    Ast_node *node = create_ast_node(node_type::STRUCT);
+      while (match(T_IDENTIFIER)) {
+        AstIdentifier param = get_ast_parameter();
+        darray_push(&get_func(node).parameters, sizeof(AstIdentifier), &param);
+        if (match(T_COMMA)) {
+          next_token();
+        }
+      }
+      assert_parser(expect(T_RIGHT_PAR));
+      assert_parser(expect(T_COLON));
+      assert_parser(is_type_id());
+      Token* type = peek();
+      copy_token(&get_func(node).return_type, type);
+      next_token();
 
-    assert_parser(match(T_IDENTIFIER));
-    Token *func_name = peek();
-    size_t name_size = func_name->end - func_name->start;
-    get_struct(node).name = (char *)malloc(name_size + 1);
-    memcpy(get_struct(node).name, func_name->start, name_size);
-    get_struct(node).name[name_size] = '\0';
-    next_token();
-    assert_parser(expect(T_LEFT_BRACE));
-
-    while (match(T_IDENTIFIER)) {
-      AstIdentifier id = get_ast_parameter();
-      darray_push(&get_struct(node).parameters, sizeof(AstIdentifier), &id);
-      assert_parser(expect(T_SEMICOLON));
+      get_func(node).block = parse_block();
+      return node;
     }
 
-    assert_parser(expect(T_RIGHT_BRACE));
+    case T_STRUCT: {
+      next_token();
+      Ast_node* node = create_ast_node(node_type::STRUCT);
 
-    return node;
-  }
-  default: {
-    return expression();
-  }
+      assert_parser(match(T_IDENTIFIER));
+      Token* func_name = peek();
+      size_t name_size = func_name->end - func_name->start;
+      get_struct(node).name = (char*)malloc(name_size + 1);
+      memcpy(get_struct(node).name, func_name->start, name_size);
+      get_struct(node).name[name_size] = '\0';
+      next_token();
+      assert_parser(expect(T_LEFT_BRACE));
+
+      while (match(T_IDENTIFIER)) {
+        AstIdentifier id = get_ast_parameter();
+        darray_push(&get_struct(node).parameters, sizeof(AstIdentifier), &id);
+        assert_parser(expect(T_SEMICOLON));
+      }
+
+      assert_parser(expect(T_RIGHT_BRACE));
+
+      return node;
+    }
+    default: {
+      return expression();
+    }
   }
 }
 
-Ast_node *parse_block() {
+Ast_node* parse_block() {
   assert_parser(expect(T_LEFT_BRACE));
-  Ast_node *node = create_ast_node(node_type::BLOCK);
+  Ast_node* node = create_ast_node(node_type::BLOCK);
   while (!match(T_RIGHT_BRACE) && !match(T_EOF)) {
-    Ast_node *stmt = statement();
-    darray_push(&get_block(node).statements, sizeof(Ast_node), (void *)stmt);
+    Ast_node* stmt = statement();
+    darray_push(&get_block(node).statements, sizeof(Ast_node), (void*)stmt);
   };
   assert_parser(expect(T_RIGHT_BRACE));
   return node;
 }
 
-Ast_node *expression(bool semicolon) {
-  Ast_node *r = decl();
+Ast_node* expression(bool semicolon) {
+  Ast_node* r = decl();
   if (semicolon) {
     assert_parser(expect(T_SEMICOLON));
   }
   return r;
 }
 
-std::string get_identifier_name(Token *token) {
+std::string get_identifier_name(Token* token) {
   assert_parser(token->type == T_IDENTIFIER);
   std::string name(token->start, token->end - token->start);
   return name;
 }
 
-Ast_node *create_assign(int op, Token *ident, Token *type) {
+Ast_node* create_assign(int op, Token* ident, Token* type) {
   assert_parser(ident != NULL);
   assert_parser(type != NULL);
 
-  Ast_node *node = create_ast_node(BINARY);
+  Ast_node* node = create_ast_node(BINARY);
   get_binary(node).op = binary_type::DECL;
   get_binary(node).left = create_ast_node(IDENTIFIER);
   copy_token(&get_identifier(get_binary_left(node)).token, ident);
@@ -241,19 +243,18 @@ Ast_node *create_assign(int op, Token *ident, Token *type) {
   if (op == binary_type::DECL) {
     parser.identifiers.emplace(ident_name, type);
   }
-  copy_token(&get_identifier(get_binary_left(node)).type,
-             parser.identifiers[ident_name]);
+  copy_token(&get_identifier(get_binary_left(node)).type, parser.identifiers[ident_name]);
   return node;
 }
 
-Ast_node *decl() {
+Ast_node* decl() {
   if (match(T_IDENTIFIER) && match(T_COLON, 1)) {
-    Token *ident = next_token();
+    Token* ident = next_token();
     next_token();
     if (is_type_id()) {
-      Token *type = next_token();
+      Token* type = next_token();
       if (expect(T_EQUAL)) {
-        Ast_node *node = create_assign(binary_type::DECL, ident, type);
+        Ast_node* node = create_assign(binary_type::DECL, ident, type);
         get_binary_right(node) = term();
         return node;
       }
@@ -262,36 +263,34 @@ Ast_node *decl() {
   return assignment();
 }
 
-Ast_node *assignment() {
+Ast_node* assignment() {
   if (match(T_IDENTIFIER) && match(T_EQUAL, 1)) {
-    Token *ident = next_token();
+    Token* ident = next_token();
     next_token();
     auto ident_it = parser.identifiers.find(get_identifier_name(ident));
     if (ident_it == parser.identifiers.end()) {
-      printf("Error, identifier %s isn't declared\n",
-             get_identifier_name(ident).c_str());
+      printf("Error, identifier %s isn't declared\n", get_identifier_name(ident).c_str());
       exit(1);
     }
-    Ast_node *node =
-        create_assign(binary_type::ASSIGN, ident,
-                      parser.identifiers[get_identifier_name(ident)]);
+    Ast_node* node =
+        create_assign(binary_type::ASSIGN, ident, parser.identifiers[get_identifier_name(ident)]);
     get_binary_right(node) = term();
     return node;
   }
   return term();
 }
 
-Ast_node *term() {
-  Ast_node *t = factor();
+Ast_node* term() {
+  Ast_node* t = factor();
 
-  Token *p = peek();
+  Token* p = peek();
 
-  Ast_node *bin = t;
-  Ast_node *previous = NULL;
+  Ast_node* bin = t;
+  Ast_node* previous = NULL;
 
   bool added = 0;
   while (match('-') || match('+')) {
-    next_token(); // peek successful
+    next_token();  // peek successful
     previous = bin;
     bin = create_ast_node(node_type::BINARY);
     get_binary(bin).left = previous;
@@ -302,18 +301,20 @@ Ast_node *term() {
     }
     get_binary(bin).right = factor();
 
-    if (get_binary(bin).left->type == node_type::EXPRESSION 
-        && get_binary(bin).right->type == node_type::EXPRESSION 
-        && get_expression(get_binary(bin).left).type == node_type::LITERAL
-        && get_expression(get_binary(bin).right).type == node_type::LITERAL) {
+    if (get_binary(bin).left->type == node_type::EXPRESSION &&
+        get_binary(bin).right->type == node_type::EXPRESSION &&
+        get_expression(get_binary(bin).left).type == node_type::LITERAL &&
+        get_expression(get_binary(bin).right).type == node_type::LITERAL) {
       bin->type = node_type::EXPRESSION;
       Ast_node* right = get_binary(bin).right;
       literal_type type = get_literal(get_binary(bin).left).type;
-      get_literal(bin).value = ast_do_binary_op(&get_literal(get_binary(bin).left), 
-          &get_literal(get_binary(bin).right), get_binary(bin).op);
+      get_literal(bin).value =
+          ast_do_binary_op(&get_literal(get_binary(bin).left), &get_literal(get_binary(bin).right),
+                           get_binary(bin).op);
       get_literal(bin).type = type;
       get_expression(bin).type = node_type::LITERAL;
-      free(right); // TODO: implement arena so that nested ast_nodes of this expression are not leaked
+      free(right);  // TODO: implement arena so that nested ast_nodes of this
+                    // expression are not leaked
     }
 
     added = 1;
@@ -324,46 +325,45 @@ Ast_node *term() {
   return t;
 }
 
-Ast_node *factor() { return literal(); }
+Ast_node* factor() { return literal(); }
 
-Ast_node *literal() {
-  Ast_node *l = create_ast_node(node_type::LITERAL);
-  Token *p = next_token();
+Ast_node* literal() {
+  Ast_node* l = create_ast_node(node_type::LITERAL);
+  Token* p = next_token();
   switch (p->type) {
-  case T_CHAR:
-    get_literal(l).value = *(p->start);
-    get_literal(l).type = literal_type::CHAR;
-    break;
-  case T_INT:
-    get_literal(l).value = (int)atoi(p->start);
-    get_literal(l).type = literal_type::INT;
-    break;
-  case T_FLOAT:
-    {
+    case T_CHAR:
+      get_literal(l).value = *(p->start);
+      get_literal(l).type = literal_type::CHAR;
+      break;
+    case T_INT:
+      get_literal(l).value = (int)atoi(p->start);
+      get_literal(l).type = literal_type::INT;
+      break;
+    case T_FLOAT: {
       float f = atof(p->start);
       get_literal(l).value = *(int*)&f;
       get_literal(l).type = literal_type::FLOAT;
       break;
     }
-  case T_BOOL:
-    if (strncmp("true", p->start, 4) == 0) {
-      get_literal(l).value = 1;
-    } else if (strncmp("false", p->start, 5) == 0) {
-      get_literal(l).value = 0;
-    } else {
-      printf("unexpected bool token %s\n", p->start);
+    case T_BOOL:
+      if (strncmp("true", p->start, 4) == 0) {
+        get_literal(l).value = 1;
+      } else if (strncmp("false", p->start, 5) == 0) {
+        get_literal(l).value = 0;
+      } else {
+        printf("unexpected bool token %s\n", p->start);
+        exit(1);
+      }
+      break;
+    default:
+      printf("Error parsing literal");
+      print_token(peek(-2));
+      print_token(peek(-1));
+      print_token(peek(0));
+      print_token(peek(1));
+      print_token(peek(2));
+      print_token(peek(3));
       exit(1);
-    }
-    break;
-  default:
-    printf("Error parsing literal");
-    print_token(peek(-2));
-    print_token(peek(-1));
-    print_token(peek(0));
-    print_token(peek(1));
-    print_token(peek(2));
-    print_token(peek(3));
-    exit(1);
   }
   return l;
 }
@@ -373,33 +373,27 @@ bool is_type_id(int pos) {
          match(T_CHARID, pos);
 }
 
-int ast_do_binary_op(AstLiteral *left, AstLiteral *right, binary_type type) {
-  switch(type) {
-    case binary_type::ADD: 
-      {
-        ast_do_binary_op_wrap(left, right, +);
-      }
-      case SUB:
-      {
-        ast_do_binary_op_wrap(left, right, -);
-      }
-      case MULTI:
-      {
-        ast_do_binary_op_wrap(left, right, *);
-      }
-      case DIV:
-      {
-        ast_do_binary_op_wrap(left, right, /);
-      }
-      case DECL:
-      {
-        printf("error binary op decl cannot be pre executed\n");
-        exit(1);
-      }
-      case ASSIGN:
-      {
-        printf("error binary op assign cannot be pre executed\n");
-        exit(1);
-      }
+int ast_do_binary_op(AstLiteral* left, AstLiteral* right, binary_type type) {
+  switch (type) {
+    case binary_type::ADD: {
+      ast_do_binary_op_wrap(left, right, +);
+    }
+    case SUB: {
+      ast_do_binary_op_wrap(left, right, -);
+    }
+    case MULTI: {
+      ast_do_binary_op_wrap(left, right, *);
+    }
+    case DIV: {
+      ast_do_binary_op_wrap(left, right, /);
+    }
+    case DECL: {
+      printf("error binary op decl cannot be pre executed\n");
+      exit(1);
+    }
+    case ASSIGN: {
+      printf("error binary op assign cannot be pre executed\n");
+      exit(1);
+    }
   }
 }
