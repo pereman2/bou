@@ -6,9 +6,11 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "arena.h"
 #include "ast_node.h"
 #include "debug.h"
 #include "token.h"
+#include "util.h"
 
 Parser parser;
 
@@ -17,13 +19,15 @@ Ast_node* parse(Token** tokens, int ntokens) {
   parser.tokens = tokens;
   parser.ntokens = ntokens;
   parser.ip = 0;
+  parser.arena = arena_create_and_init(MB(4));
+  printf("%d arena size\n", MB(4));
   Ast_node* ast = statement();
   print_ast(ast);
   return ast;
 }
 
 Ast_node* create_ast_node(node_type type) {
-  Ast_node* node = (Ast_node*)malloc(sizeof(Ast_node));
+  Ast_node* node = (Ast_node*)arena_allocate(parser.arena, sizeof(Ast_node));
   node->type = type;
   switch (type) {
     case LITERAL:
@@ -151,7 +155,7 @@ Ast_node* statement() {
       assert_parser(match(T_IDENTIFIER));
       Token* func_name = peek();
       size_t name_size = func_name->end - func_name->start;
-      get_func(node).name = (char*)malloc(name_size + 1);
+      get_func(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
       memcpy(get_func(node).name, func_name->start, name_size);
       get_func(node).name[name_size] = '\0';
 
@@ -183,7 +187,7 @@ Ast_node* statement() {
       assert_parser(match(T_IDENTIFIER));
       Token* func_name = peek();
       size_t name_size = func_name->end - func_name->start;
-      get_struct(node).name = (char*)malloc(name_size + 1);
+      get_struct(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
       memcpy(get_struct(node).name, func_name->start, name_size);
       get_struct(node).name[name_size] = '\0';
       next_token();
@@ -313,8 +317,6 @@ Ast_node* term() {
                            get_binary(bin).op);
       get_literal(bin).type = type;
       get_expression(bin).type = node_type::LITERAL;
-      free(right);  // TODO: implement arena so that nested ast_nodes of this
-                    // expression are not leaked
     }
 
     added = 1;

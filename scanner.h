@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "arena.h"
 #include "token.h"
 
 struct Scanner {

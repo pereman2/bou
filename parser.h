@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+#include "arena.h"
 #include "ast_node.h"
 #include "token.h"
 
@@ -11,6 +12,7 @@ struct Parser {
   Token** tokens;
   int ntokens;
   int ip;
+  Arena *arena;
   std::map<std::string, Token*> identifiers;
 };
 

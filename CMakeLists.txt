@@ -16,6 +16,7 @@ set(sources
 	elf.cc
 	parser.cc
 	scanner.cc
+  arena.cc
   )
 # add the executable
 add_executable(bou
