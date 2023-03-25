@@ -12,6 +12,7 @@
 #include "token.h"
 #include "util.h"
 
+
 Parser parser;
 
 Ast_node* parse(Token** tokens, int ntokens) {

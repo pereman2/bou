@@ -9,7 +9,6 @@ project(Bou
 	LANGUAGES CXX C ASM)
 
 set(sources 
-	ast_node.cc
 	compiler.cc
 	darray.cc
 	debug.cc
@@ -24,6 +23,13 @@ add_executable(bou
   ${sources}
   )
 
+add_executable(test_ast
+  parser.cc
+  darray.cc
+  arena.cc
+  debug.cc
+  test_ast.cc
+	)
 add_executable(test
   test_darray.cc
   darray.cc

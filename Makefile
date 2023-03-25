@@ -117,6 +117,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named test
+
+# Build rule for target.
+test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
+.PHONY : test
+
+# fast build rule for target.
+test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
+.PHONY : test/fast
+
+#=============================================================================
+# Target rules for targets named test_ast
+
+# Build rule for target.
+test_ast: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_ast
+.PHONY : test_ast
+
+# fast build rule for target.
+test_ast/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/build
+.PHONY : test_ast/fast
+
+#=============================================================================
 # Target rules for targets named bou
 
 # Build rule for target.
@@ -129,29 +155,32 @@ bou/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/build
 .PHONY : bou/fast
 
-ast_node.o: ast_node.cc.o
-.PHONY : ast_node.o
+arena.o: arena.cc.o
+.PHONY : arena.o
 
 # target to build an object file
-ast_node.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/ast_node.cc.o
-.PHONY : ast_node.cc.o
+arena.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.o
+.PHONY : arena.cc.o
 
-ast_node.i: ast_node.cc.i
-.PHONY : ast_node.i
+arena.i: arena.cc.i
+.PHONY : arena.i
 
 # target to preprocess a source file
-ast_node.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/ast_node.cc.i
-.PHONY : ast_node.cc.i
+arena.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.i
+.PHONY : arena.cc.i
 
-ast_node.s: ast_node.cc.s
-.PHONY : ast_node.s
+arena.s: arena.cc.s
+.PHONY : arena.s
 
 # target to generate assembly for a file
-ast_node.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/ast_node.cc.s
-.PHONY : ast_node.cc.s
+arena.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.s
+.PHONY : arena.cc.s
 
 bou.o: bou.cc.o
 .PHONY : bou.o
@@ -206,6 +235,8 @@ darray.o: darray.cc.o
 
 # target to build an object file
 darray.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.o
 .PHONY : darray.cc.o
 
@@ -214,6 +245,8 @@ darray.i: darray.cc.i
 
 # target to preprocess a source file
 darray.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.i
 .PHONY : darray.cc.i
 
@@ -222,6 +255,8 @@ darray.s: darray.cc.s
 
 # target to generate assembly for a file
 darray.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.s
 .PHONY : darray.cc.s
 
@@ -230,6 +265,7 @@ debug.o: debug.cc.o
 
 # target to build an object file
 debug.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.o
 .PHONY : debug.cc.o
 
@@ -238,6 +274,7 @@ debug.i: debug.cc.i
 
 # target to preprocess a source file
 debug.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.i
 .PHONY : debug.cc.i
 
@@ -246,6 +283,7 @@ debug.s: debug.cc.s
 
 # target to generate assembly for a file
 debug.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.s
 .PHONY : debug.cc.s
 
@@ -278,6 +316,7 @@ parser.o: parser.cc.o
 
 # target to build an object file
 parser.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.o
 .PHONY : parser.cc.o
 
@@ -286,6 +325,7 @@ parser.i: parser.cc.i
 
 # target to preprocess a source file
 parser.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.i
 .PHONY : parser.cc.i
 
@@ -294,6 +334,7 @@ parser.s: parser.cc.s
 
 # target to generate assembly for a file
 parser.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.s
 .PHONY : parser.cc.s
 
@@ -321,6 +362,54 @@ scanner.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/scanner.cc.s
 .PHONY : scanner.cc.s
 
+test_ast.o: test_ast.cc.o
+.PHONY : test_ast.o
+
+# target to build an object file
+test_ast.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/test_ast.cc.o
+.PHONY : test_ast.cc.o
+
+test_ast.i: test_ast.cc.i
+.PHONY : test_ast.i
+
+# target to preprocess a source file
+test_ast.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/test_ast.cc.i
+.PHONY : test_ast.cc.i
+
+test_ast.s: test_ast.cc.s
+.PHONY : test_ast.s
+
+# target to generate assembly for a file
+test_ast.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/test_ast.cc.s
+.PHONY : test_ast.cc.s
+
+test_darray.o: test_darray.cc.o
+.PHONY : test_darray.o
+
+# target to build an object file
+test_darray.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test_darray.cc.o
+.PHONY : test_darray.cc.o
+
+test_darray.i: test_darray.cc.i
+.PHONY : test_darray.i
+
+# target to preprocess a source file
+test_darray.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test_darray.cc.i
+.PHONY : test_darray.cc.i
+
+test_darray.s: test_darray.cc.s
+.PHONY : test_darray.s
+
+# target to generate assembly for a file
+test_darray.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test_darray.cc.s
+.PHONY : test_darray.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -330,9 +419,11 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... bou"
-	@echo "... ast_node.o"
-	@echo "... ast_node.i"
-	@echo "... ast_node.s"
+	@echo "... test"
+	@echo "... test_ast"
+	@echo "... arena.o"
+	@echo "... arena.i"
+	@echo "... arena.s"
 	@echo "... bou.o"
 	@echo "... bou.i"
 	@echo "... bou.s"
@@ -354,6 +445,12 @@ help:
 	@echo "... scanner.o"
 	@echo "... scanner.i"
 	@echo "... scanner.s"
+	@echo "... test_ast.o"
+	@echo "... test_ast.i"
+	@echo "... test_ast.s"
+	@echo "... test_darray.o"
+	@echo "... test_darray.i"
+	@echo "... test_darray.s"
 .PHONY : help
 
 
