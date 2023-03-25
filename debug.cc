@@ -91,6 +91,10 @@ std::string binary_op_to_str(binary_type type) {
       return ">=";
     case GREATER:
       return ">";
+    case AND:
+      return "and";
+    case OR:
+      return "or";
   }
 }
 
@@ -355,6 +359,12 @@ void print_token(Token* t) {
       break;
     case T_AMPERSAND:
       type = "T_AMPERSAND";
+      break;
+    case T_AND:
+      type = "T_AND";
+      break;
+    case T_OR:
+      type = "T_OR";
       break;
     default:
       type = "Uknown token";

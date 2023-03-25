@@ -55,6 +55,11 @@ enum token_type {
   T_LESS,
   T_LESS_EQUAL,
 
+  T_OR,
+  T_AND,
+
+  T_BIT_OR,
+
   // Are this useful?
   T_TAB,
   T_LF,

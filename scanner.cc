@@ -33,7 +33,7 @@ char peek() { return *scanner.ip; }
 
 char next_char() { return *(scanner.ip++); }
 
-bool is_numeric(char c) { return c >= '1' && c <= '9'; }
+bool is_numeric(char c) { return c >= '0' && c <= '9'; }
 
 bool is_alpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; }
 
@@ -289,7 +289,15 @@ Token* scan_token() {
       }
       return create_token(T_LESS, 0);
     case '&':
+      if (match("&", 1, 1)) {
+        return create_token(T_AND, 1);
+      }
       return create_token(T_AMPERSAND, 0);
+    case '|':
+      if (match("|", 1, 1)) {
+        return create_token(T_OR, 1);
+      }
+      return create_token(T_BIT_OR, 0);
     case '\t':
       return create_token(T_TAB, 0);
       break;

@@ -352,15 +352,36 @@ Ast_node* decl() {
       }
       assert_parser(expect(T_EQUAL));
       Ast_node* node = create_assign(binary_type::DECL, ident, type);
-      get_binary_right(node) = comparison();
+      get_binary_right(node) = logic();
       return node;
     }
   }
-  return comparison();
+  return logic();
 }
 
 AstIdentifier lookup_identifier(Token *ident_token) {
   return parser.identifiers[get_identifier_name(ident_token)];
+}
+
+Ast_node* logic() {
+  Ast_node *left = comparison();
+  bool added = 0;
+  if(match(T_AND) || match(T_OR)) {
+    binary_type op = binary_type::AND;
+    if (match(T_OR)) {
+      op = binary_type::OR;
+    }
+    next_token();
+    Ast_node *node = create_ast_node(node_type::BINARY);
+    Ast_node* right = logic();
+    get_binary(node).left = left;
+    get_binary(node).right = right;
+    get_binary(node).op = op;
+    return node;
+  }
+
+  return left;
+
 }
 
 Ast_node* comparison() {

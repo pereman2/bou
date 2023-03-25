@@ -45,11 +45,16 @@ enum binary_type {
   ASSIGN,
   MULTI,
   DIV,
+
   EQUAL_EQUAL,
   LESS,
   LESS_EQUAL,
   GREATER_EQUAL,
-  GREATER
+  GREATER,
+
+  AND,
+  OR
+
 };
 
 struct AstBinary {
