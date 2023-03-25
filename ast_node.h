@@ -4,6 +4,7 @@
 #include "token.h"
 
 #define get_literal(node) node->value.expression.expr.literal
+#define get_unary(node) node->value.expression.expr.unary
 
 #define get_binary(node) node->value.expression.expr.binary
 #define get_binary_left(node) node->value.expression.expr.binary.left
@@ -28,6 +29,7 @@ typedef enum {
   BINARY,
   LITERAL,
   IDENTIFIER,
+  UNARY,
 
   // types of statements
   BLOCK,
@@ -46,26 +48,43 @@ struct AstBinary {
   binary_type op;
 };
 
-struct AstIdentifier {
-  Token token;
-  Token type;
+enum value_type {
+  CHAR, INT, FLOAT, BOOL, IDENT 
 };
 
-enum literal_type {
-  INT,
-  CHAR,
-  FLOAT,
-  BOOL,
+struct AstType {
+  value_type value;
+  char *ident_name;
+  bool is_pointer;
+};
+
+struct AstIdentifier {
+  Token token;
+  AstType type;
 };
 
 struct AstLiteral {
-  literal_type type;
+  value_type type;
   int value;
+};
+
+enum unary_type {
+  DEREF, GET_PTR
+};
+
+struct AstUnary {
+  unary_type type;
+   // TODO: we need to check wether we can deref or get_ptr based on the expected type from the evaluation of the ast_node
+   // if a is not a pointer it should fail.
+   // *(a + (b + 10)
+  Ast_node *node;
 };
 
 struct AstExpression {
   node_type type;
+  AstType evaluates_to;
   union {
+    AstUnary unary;
     AstBinary binary;
     AstLiteral literal;
     AstIdentifier identifier;
@@ -85,7 +104,7 @@ struct AstFunc {
   char* name;
   darray parameters;  // AstIdentifier
   Ast_node* block;
-  Token return_type;
+  AstType return_type;
 };
 
 struct AstIf {
@@ -123,11 +142,11 @@ struct Ast_node {
   {                                             \
     if (l->type == FLOAT || r->type == FLOAT) { \
       float lhs = get_float_from_int(l->value); \
-      if (l->type != literal_type::FLOAT) {     \
+      if (l->type != value_type::FLOAT) {     \
         lhs = (float)l->value;                  \
       }                                         \
       float rhs = get_float_from_int(r->value); \
-      if (r->type != literal_type::FLOAT) {     \
+      if (r->type != value_type::FLOAT) {     \
         rhs = (float)r->value;                  \
       }                                         \
       float res = lhs op rhs;                   \

@@ -33,9 +33,47 @@ std::string ast_node_to_string(Ast_node* root) {
   return ss.str();
 }
 
+std::string get_type(AstType *type) {
+  std::string stype;
+  switch(type->value) {
+    case CHAR:
+      stype += "char";
+      break;
+    case INT:
+      stype += "int";
+      break;
+    case FLOAT:
+      stype += "float";
+      break;
+    case BOOL:
+      stype += "bool";
+      break;
+    case IDENT:
+      stype += type->ident_name;
+      break;
+  }
+  if (type->is_pointer) {
+    stype += "*";
+  }
+  return stype;
+};
+
+std::string ast_unary_type_str(unary_type type) {
+  switch(type) {
+    case DEREF:
+      return "deref";
+    case GET_PTR:
+      return "ptr";
+  }
+}
+
 std::string ast_expression_to_string(Ast_node* root) {
   std::stringstream ss;
   switch (root->value.expression.type) {
+    case UNARY:
+      ss << root << " UNARY (" << ast_unary_type_str(get_unary(root).type) 
+        << " " << ast_node_to_string(get_unary(root).node) << ")";
+      break;
     case BINARY:
       ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left) << " + "
          << ast_node_to_string(get_binary(root).right) << ")";
@@ -51,9 +89,7 @@ std::string ast_expression_to_string(Ast_node* root) {
         name.push_back(*start);
         start++;
       }
-      std::string type(get_identifier(root).type.start,
-                       get_identifier(root).type.end - get_identifier(root).type.start);
-      ss << root << " IDENT " << type << " " << name;
+      ss << root << " IDENT " << get_type(&get_identifier(root).type) << " " << name;
       break;
   }
   return ss.str();
@@ -83,7 +119,9 @@ std::string ast_statement_to_string(Ast_node* root) {
       for (int i = 0; i < darray_length(&func->parameters, sizeof(AstIdentifier)); i++) {
         AstIdentifier* param =
             (AstIdentifier*)darray_get(&func->parameters, sizeof(AstIdentifier), i);
-        ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << " ";
+        ss << token_to_str(&param->token) << ": " << get_type(&param->type);
+        ss << " ";
+        
       }
       ss << "\n";
       ss << ast_block_to_str(&get_block(func->block), func->name);
@@ -95,7 +133,8 @@ std::string ast_statement_to_string(Ast_node* root) {
       for (int i = 0; i < darray_length(&structs->parameters, sizeof(AstIdentifier)); i++) {
         AstIdentifier* param =
             (AstIdentifier*)darray_get(&structs->parameters, sizeof(AstIdentifier), i);
-        ss << token_to_str(&param->token) << ": " << token_to_str(&param->type) << ";\n";
+        ss << token_to_str(&param->token) << ": " << get_type(&param->type);
+        ss << ";\n";
       }
       ss << "}\n";
       break;
@@ -118,13 +157,13 @@ std::string ast_block_to_str(AstBlock* block, std::string block_name) {
 
 std::string literal_repr(AstLiteral* literal) {
   switch (literal->type) {
-    case literal_type::INT:
+    case value_type::INT:
       return std::to_string(literal->value);
-    case literal_type::CHAR:
+    case value_type::CHAR:
       return std::to_string((char)literal->value);
-    case literal_type::FLOAT:
+    case value_type::FLOAT:
       return std::to_string(*(float*)&literal->value);
-    case literal_type::BOOL:
+    case value_type::BOOL:
       return std::to_string((bool)literal->value);
     default:
       return "debug: unknown literal type\n";
@@ -285,6 +324,9 @@ void print_token(Token* t) {
       break;
     case T_EOF:
       type = "T_EOF";
+      break;
+    case T_AMPERSAND:
+      type = "T_AMPERSAND";
       break;
     default:
       type = "Uknown token";

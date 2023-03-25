@@ -44,6 +44,7 @@ enum token_type {
   T_SEMICOLON,
   T_COLON,
   T_COMMA,
+  T_AMPERSAND,
 
   T_BANG,
   T_BANG_EQUAL,

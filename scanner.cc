@@ -288,6 +288,8 @@ Token* scan_token() {
         return create_token(T_SHIFT_LEFT, 1);
       }
       return create_token(T_LESS, 0);
+    case '&':
+      return create_token(T_AMPERSAND, 0);
     case '\t':
       return create_token(T_TAB, 0);
       break;
