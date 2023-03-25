@@ -38,7 +38,19 @@ typedef enum {
   STRUCT
 } node_type;
 
-enum binary_type { ADD, SUB, DECL, ASSIGN, MULTI, DIV };
+enum binary_type {
+  ADD,
+  SUB,
+  DECL,
+  ASSIGN,
+  MULTI,
+  DIV,
+  EQUAL_EQUAL,
+  LESS,
+  LESS_EQUAL,
+  GREATER_EQUAL,
+  GREATER
+};
 
 struct AstBinary {
   Ast_node* left;

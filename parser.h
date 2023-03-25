@@ -25,6 +25,7 @@ Ast_node* expression(bool semicolon = true);
 
 Ast_node* decl();
 Ast_node* ident();
+Ast_node* comparison();
 Ast_node* assignment();
 
 Ast_node* term();

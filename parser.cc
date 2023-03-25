@@ -351,15 +351,43 @@ Ast_node* decl() {
       }
       assert_parser(expect(T_EQUAL));
       Ast_node* node = create_assign(binary_type::DECL, ident, type);
-      get_binary_right(node) = term();
+      get_binary_right(node) = comparison();
       return node;
     }
   }
-  return assignment();
+  return comparison();
 }
 
 AstIdentifier lookup_identifier(Token *ident_token) {
   return parser.identifiers[get_identifier_name(ident_token)];
+}
+
+Ast_node* comparison() {
+  Ast_node *left = assignment();
+  if (match(T_EQUAL_EQUAL) || match(T_LESS) || match(T_LESS_EQUAL)
+      || match(T_GREATER) || match(T_GREATER_EQUAL)) {
+    Ast_node *node = create_ast_node(node_type::BINARY);
+    get_expression(node).evaluates_to.is_pointer = false;
+    get_expression(node).evaluates_to.value = value_type::BOOL;
+    get_binary(node).left = left;
+    if (match(T_EQUAL_EQUAL)) {
+      get_binary(node).op = binary_type::EQUAL_EQUAL;
+    } else if (match(T_LESS)) {
+      get_binary(node).op = binary_type::LESS;
+    } else if (match(T_GREATER_EQUAL)) {
+      get_binary(node).op = binary_type::GREATER_EQUAL;
+    } else if (match(T_LESS_EQUAL)) {
+      get_binary(node).op = binary_type::LESS_EQUAL;
+    } else if (match(T_GREATER)) {
+      get_binary(node).op = binary_type::GREATER;
+    } else {
+      assert_parser(false);
+    }
+    next_token(); 
+    get_binary(node).right = comparison();
+    return node;
+  }
+  return left;
 }
 
 Ast_node* assignment() {

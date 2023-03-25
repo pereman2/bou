@@ -67,6 +67,33 @@ std::string ast_unary_type_str(unary_type type) {
   }
 }
 
+std::string binary_op_to_str(binary_type type) {
+  switch(type) {
+    case ADD:
+      return "+";
+    case SUB:
+      return "-";
+    case DECL:
+      return "=";
+    case ASSIGN:
+      return "=";
+    case MULTI:
+      return "+";
+    case DIV:
+      return "/";
+    case EQUAL_EQUAL:
+      return "==";
+    case LESS:
+      return "<";
+    case LESS_EQUAL:
+      return "<=";
+    case GREATER_EQUAL:
+      return ">=";
+    case GREATER:
+      return ">";
+  }
+}
+
 std::string ast_expression_to_string(Ast_node* root) {
   std::stringstream ss;
   switch (root->value.expression.type) {
@@ -75,8 +102,9 @@ std::string ast_expression_to_string(Ast_node* root) {
         << " " << ast_node_to_string(get_unary(root).node) << ")";
       break;
     case BINARY:
-      ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left) << " + "
-         << ast_node_to_string(get_binary(root).right) << ")";
+      ss << root << " BINARY (" << ast_node_to_string(get_binary(root).left) 
+        << " " << binary_op_to_str(get_binary(root).op)
+        << " " << ast_node_to_string(get_binary(root).right) << ")";
       break;
     case LITERAL:
       ss << root << " LITERAL " << literal_repr(&get_literal(root));
