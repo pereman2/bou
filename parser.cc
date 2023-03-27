@@ -386,6 +386,7 @@ Ast_node* logic() {
 
 Ast_node* comparison() {
   Ast_node *left = assignment();
+  // TODO: T_BANG_EQUAL
   if (match(T_EQUAL_EQUAL) || match(T_LESS) || match(T_LESS_EQUAL)
       || match(T_GREATER) || match(T_GREATER_EQUAL)) {
     Ast_node *node = create_ast_node(node_type::BINARY);
@@ -477,7 +478,53 @@ Ast_node* term() {
   return t;
 }
 
-Ast_node* factor() { return deref(); }
+Ast_node* factor() { return unary(); }
+
+Ast_node* unary() {
+  if (match(T_MINUS)) {
+    next_token();
+    // We treat a "- something " as "0 - something"
+    Ast_node *node = create_ast_node(node_type::BINARY);
+    Ast_node *left = create_ast_node(node_type::LITERAL);
+    Ast_node *right = deref();
+    get_binary(node).left = left;
+    get_binary(node).right = right;
+    get_binary(node).op = binary_type::SUB;
+    switch(get_expression(right).evaluates_to.value )
+    {
+      case CHAR:
+        printf("cannot negative char\n");
+        exit(1);
+      case INT:
+        break;
+      case FLOAT:
+        break;
+      case BOOL:
+        printf("cannot turn negative bool\n");
+        exit(1);
+        break;
+      case IDENT:
+        break;
+    }
+    get_literal(left).value = 0;
+    get_literal(left).type = get_expression(right).evaluates_to.value;
+    get_expression(node).evaluates_to = get_expression(right).evaluates_to;
+    return node;
+  }
+
+  if (match(T_BANG)) {
+    next_token();
+    Ast_node *node = create_ast_node(node_type::UNARY);
+    Ast_node *value = deref();
+    // TODO: forbid negation of struct, enum...
+    get_expression(node).evaluates_to = get_expression(value).evaluates_to;
+    get_unary(node).type = unary_type::NEGATE;
+    get_unary(node).node = value;
+    return node;
+  }
+
+  return deref();
+}
 
 Ast_node* deref() {
   if (match(T_STAR)) {

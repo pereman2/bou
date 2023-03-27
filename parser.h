@@ -31,6 +31,7 @@ Ast_node* assignment();
 
 Ast_node* term();
 Ast_node* factor();
+Ast_node* unary();
 Ast_node* deref();
 Ast_node* ref();
 Ast_node* literal();

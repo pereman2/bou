@@ -64,6 +64,8 @@ std::string ast_unary_type_str(unary_type type) {
       return "deref";
     case GET_PTR:
       return "ptr";
+    case NEGATE:
+      return "negate";
   }
 }
 

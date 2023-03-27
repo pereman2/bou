@@ -86,7 +86,7 @@ struct AstLiteral {
 };
 
 enum unary_type {
-  DEREF, GET_PTR
+  DEREF, GET_PTR, NEGATE
 };
 
 struct AstUnary {
