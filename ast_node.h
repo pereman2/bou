@@ -43,7 +43,7 @@ enum binary_type {
   SUB,
   DECL,
   ASSIGN,
-  MULTI,
+  MULT,
   DIV,
 
   EQUAL_EQUAL,

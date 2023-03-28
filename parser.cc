@@ -478,7 +478,32 @@ Ast_node* term() {
   return t;
 }
 
-Ast_node* factor() { return unary(); }
+Ast_node* factor() { 
+  Ast_node *left = unary();
+  if (match(T_STAR)) {
+    next_token();
+    Ast_node *node = create_ast_node(node_type::BINARY);
+    Ast_node *right = unary();
+    get_binary(node).op = binary_type::MULT; 
+    get_binary(node).left = left;
+    get_binary(node).right = right;
+    // TODO: add evaluation coercion depending of the values on the left, right
+    get_expression(node).evaluates_to = get_expression(left).evaluates_to;
+    return node;
+  }
+  if (match(T_SLASH)) {
+    next_token();
+    Ast_node *node = create_ast_node(node_type::BINARY);
+    Ast_node *right = unary();
+    get_binary(node).op = binary_type::DIV; 
+    get_binary(node).left = left;
+    get_binary(node).right = right;
+    // TODO: add evaluation coercion depending of the values on the left, right
+    get_expression(node).evaluates_to = get_expression(left).evaluates_to;
+    return node;
+  }
+  return unary(); 
+}
 
 Ast_node* unary() {
   if (match(T_MINUS)) {
@@ -617,7 +642,7 @@ int ast_do_binary_op(AstLiteral* left, AstLiteral* right, binary_type type) {
     case SUB: {
       ast_do_binary_op_wrap(left, right, -);
     }
-    case MULTI: {
+    case MULT: {
       ast_do_binary_op_wrap(left, right, *);
     }
     case DIV: {

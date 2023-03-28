@@ -79,8 +79,8 @@ std::string binary_op_to_str(binary_type type) {
       return "=";
     case ASSIGN:
       return "=";
-    case MULTI:
-      return "+";
+    case MULT:
+      return "*";
     case DIV:
       return "/";
     case EQUAL_EQUAL:
