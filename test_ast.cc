@@ -7,6 +7,11 @@
 #include "test_util.h"
 #include "token.h"
 
+#include "parser.cc"
+#include "darray.cc"
+#include "arena.cc"
+#include "debug.cc"
+
 struct TokenState {
   Token* tokens[1024];
   int token_ip;

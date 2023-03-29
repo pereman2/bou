@@ -155,80 +155,29 @@ bou/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/build
 .PHONY : bou/fast
 
-arena.o: arena.cc.o
-.PHONY : arena.o
+compilation.o: compilation.cc.o
+.PHONY : compilation.o
 
 # target to build an object file
-arena.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.o
-.PHONY : arena.cc.o
+compilation.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compilation.cc.o
+.PHONY : compilation.cc.o
 
-arena.i: arena.cc.i
-.PHONY : arena.i
-
-# target to preprocess a source file
-arena.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.i
-.PHONY : arena.cc.i
-
-arena.s: arena.cc.s
-.PHONY : arena.s
-
-# target to generate assembly for a file
-arena.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/arena.cc.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/arena.cc.s
-.PHONY : arena.cc.s
-
-bou.o: bou.cc.o
-.PHONY : bou.o
-
-# target to build an object file
-bou.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/bou.cc.o
-.PHONY : bou.cc.o
-
-bou.i: bou.cc.i
-.PHONY : bou.i
+compilation.i: compilation.cc.i
+.PHONY : compilation.i
 
 # target to preprocess a source file
-bou.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/bou.cc.i
-.PHONY : bou.cc.i
+compilation.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compilation.cc.i
+.PHONY : compilation.cc.i
 
-bou.s: bou.cc.s
-.PHONY : bou.s
-
-# target to generate assembly for a file
-bou.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/bou.cc.s
-.PHONY : bou.cc.s
-
-compiler.o: compiler.cc.o
-.PHONY : compiler.o
-
-# target to build an object file
-compiler.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compiler.cc.o
-.PHONY : compiler.cc.o
-
-compiler.i: compiler.cc.i
-.PHONY : compiler.i
-
-# target to preprocess a source file
-compiler.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compiler.cc.i
-.PHONY : compiler.cc.i
-
-compiler.s: compiler.cc.s
-.PHONY : compiler.s
+compilation.s: compilation.cc.s
+.PHONY : compilation.s
 
 # target to generate assembly for a file
-compiler.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compiler.cc.s
-.PHONY : compiler.cc.s
+compilation.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/compilation.cc.s
+.PHONY : compilation.cc.s
 
 darray.o: darray.cc.o
 .PHONY : darray.o
@@ -236,8 +185,6 @@ darray.o: darray.cc.o
 # target to build an object file
 darray.cc.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.o
 .PHONY : darray.cc.o
 
 darray.i: darray.cc.i
@@ -246,8 +193,6 @@ darray.i: darray.cc.i
 # target to preprocess a source file
 darray.cc.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.i
 .PHONY : darray.cc.i
 
 darray.s: darray.cc.s
@@ -256,111 +201,7 @@ darray.s: darray.cc.s
 # target to generate assembly for a file
 darray.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/darray.cc.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/darray.cc.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/darray.cc.s
 .PHONY : darray.cc.s
-
-debug.o: debug.cc.o
-.PHONY : debug.o
-
-# target to build an object file
-debug.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.o
-.PHONY : debug.cc.o
-
-debug.i: debug.cc.i
-.PHONY : debug.i
-
-# target to preprocess a source file
-debug.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.i
-.PHONY : debug.cc.i
-
-debug.s: debug.cc.s
-.PHONY : debug.s
-
-# target to generate assembly for a file
-debug.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/debug.cc.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/debug.cc.s
-.PHONY : debug.cc.s
-
-elf.o: elf.cc.o
-.PHONY : elf.o
-
-# target to build an object file
-elf.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/elf.cc.o
-.PHONY : elf.cc.o
-
-elf.i: elf.cc.i
-.PHONY : elf.i
-
-# target to preprocess a source file
-elf.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/elf.cc.i
-.PHONY : elf.cc.i
-
-elf.s: elf.cc.s
-.PHONY : elf.s
-
-# target to generate assembly for a file
-elf.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/elf.cc.s
-.PHONY : elf.cc.s
-
-parser.o: parser.cc.o
-.PHONY : parser.o
-
-# target to build an object file
-parser.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.o
-.PHONY : parser.cc.o
-
-parser.i: parser.cc.i
-.PHONY : parser.i
-
-# target to preprocess a source file
-parser.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.i
-.PHONY : parser.cc.i
-
-parser.s: parser.cc.s
-.PHONY : parser.s
-
-# target to generate assembly for a file
-parser.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ast.dir/build.make CMakeFiles/test_ast.dir/parser.cc.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/parser.cc.s
-.PHONY : parser.cc.s
-
-scanner.o: scanner.cc.o
-.PHONY : scanner.o
-
-# target to build an object file
-scanner.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/scanner.cc.o
-.PHONY : scanner.cc.o
-
-scanner.i: scanner.cc.i
-.PHONY : scanner.i
-
-# target to preprocess a source file
-scanner.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/scanner.cc.i
-.PHONY : scanner.cc.i
-
-scanner.s: scanner.cc.s
-.PHONY : scanner.s
-
-# target to generate assembly for a file
-scanner.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bou.dir/build.make CMakeFiles/bou.dir/scanner.cc.s
-.PHONY : scanner.cc.s
 
 test_ast.o: test_ast.cc.o
 .PHONY : test_ast.o
@@ -421,30 +262,12 @@ help:
 	@echo "... bou"
 	@echo "... test"
 	@echo "... test_ast"
-	@echo "... arena.o"
-	@echo "... arena.i"
-	@echo "... arena.s"
-	@echo "... bou.o"
-	@echo "... bou.i"
-	@echo "... bou.s"
-	@echo "... compiler.o"
-	@echo "... compiler.i"
-	@echo "... compiler.s"
+	@echo "... compilation.o"
+	@echo "... compilation.i"
+	@echo "... compilation.s"
 	@echo "... darray.o"
 	@echo "... darray.i"
 	@echo "... darray.s"
-	@echo "... debug.o"
-	@echo "... debug.i"
-	@echo "... debug.s"
-	@echo "... elf.o"
-	@echo "... elf.i"
-	@echo "... elf.s"
-	@echo "... parser.o"
-	@echo "... parser.i"
-	@echo "... parser.s"
-	@echo "... scanner.o"
-	@echo "... scanner.i"
-	@echo "... scanner.s"
 	@echo "... test_ast.o"
 	@echo "... test_ast.i"
 	@echo "... test_ast.s"

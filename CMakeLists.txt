@@ -14,12 +14,8 @@ add_executable(bou
   )
 
 add_executable(test_ast
-  parser.cc
-  darray.cc
-  arena.cc
-  debug.cc
   test_ast.cc
-	)
+  )
 add_executable(test
   test_darray.cc
   darray.cc

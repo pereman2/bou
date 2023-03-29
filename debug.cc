@@ -67,6 +67,7 @@ std::string ast_unary_type_str(unary_type type) {
     case NEGATE:
       return "negate";
   }
+  return "??unknown unary type??";
 }
 
 std::string binary_op_to_str(binary_type type) {
@@ -98,6 +99,7 @@ std::string binary_op_to_str(binary_type type) {
     case OR:
       return "or";
   }
+  return "??unknown binary op??";
 }
 
 std::string ast_expression_to_string(Ast_node* root) {
