@@ -8,19 +8,9 @@ project(Bou
 	VERSION 0.0.1
 	LANGUAGES CXX C ASM)
 
-set(sources 
-	compiler.cc
-	darray.cc
-	debug.cc
-	elf.cc
-	parser.cc
-	scanner.cc
-  arena.cc
-  )
-# add the executable
+# single compilation unit build
 add_executable(bou
-	bou.cc
-  ${sources}
+	compilation.cc
   )
 
 add_executable(test_ast

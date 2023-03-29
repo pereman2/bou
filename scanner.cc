@@ -29,7 +29,7 @@ void free_scanner() {
   free(scanner.tokens);
 }
 
-char peek() { return *scanner.ip; }
+char scanner_peek() { return *scanner.ip; }
 
 char next_char() { return *(scanner.ip++); }
 
@@ -37,7 +37,7 @@ bool is_numeric(char c) { return c >= '0' && c <= '9'; }
 
 bool is_alpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; }
 
-bool match(const char* to_match, size_t len, size_t size) {
+bool token_match(const char* to_match, size_t len, size_t size) {
   return len == size && memcmp(to_match, scanner.ip, size) == 0;
 }
 
@@ -78,73 +78,73 @@ Token* create_identifier_token() {
 
   switch (c) {
     case 'i':
-      if (match("nt", 2, len)) {
+      if (token_match("nt", 2, len)) {
         return create_token(T_INTID, 2);
       }
-      if (match("f", 1, len)) {
+      if (token_match("f", 1, len)) {
         return create_token(T_IF, 1);
       }
       break;
     case 'b':
-      if (match("ool", 3, len)) {
+      if (token_match("ool", 3, len)) {
         return create_token(T_BOOLID, 3);
       }
-      if (match("reak", 4, len)) {
+      if (token_match("reak", 4, len)) {
         return create_token(T_BREAK, 4);
       }
       break;
     case 'c':
-      if (match("har", 3, len)) {
+      if (token_match("har", 3, len)) {
         return create_token(T_CHARID, 0);
       }
-      if (match("ontinue", 3, len)) {
+      if (token_match("ontinue", 3, len)) {
         return create_token(T_CONTINUE, 0);
       }
       break;
     case 'd':
-      if (match("ef", 2, len)) {
+      if (token_match("ef", 2, len)) {
         return create_token(T_DEF, 2);
       }
-      if (match("ouble", 5, len)) {
+      if (token_match("ouble", 5, len)) {
         return create_token(T_DOUBLEID, 5);
       }
       break;
     case 'e':
-      if (match("lse", 3, len)) {
+      if (token_match("lse", 3, len)) {
         return create_token(T_ELSE, 3);
       }
       break;
     case 'f':
-      if (match("or", 3, len)) {
+      if (token_match("or", 3, len)) {
         return create_token(T_FOR, 3);
       }
-      if (match("loat", 4, len)) {
+      if (token_match("loat", 4, len)) {
         return create_token(T_FLOATID, 4);
       }
-      if (match("alse", 4, len)) {
+      if (token_match("alse", 4, len)) {
         return create_token(T_BOOL, 4);
       }
       break;
     case 'r':
-      if (match("eturn", 5, len)) {
+      if (token_match("eturn", 5, len)) {
         return create_token(T_RETURN, 5);
       }
       break;
     case 's':
-      if (match("tring", 5, len)) {
+      if (token_match("tring", 5, len)) {
         return create_token(T_STRINGID, 5);
       }
-      if (match("truct", 5, len)) {
+      if (token_match("truct", 5, len)) {
         return create_token(T_STRUCT, 5);
       }
       break;
     case 't':
-      if (match("rue", 3, len)) {
+      if (token_match("rue", 3, len)) {
         return create_token(T_BOOL, 3);
       }
       break;
     case 'w':
-      if (match("hile", 4, len)) {
+      if (token_match("hile", 4, len)) {
         return create_token(T_WHILE, 4);
       }
       break;
@@ -213,11 +213,11 @@ void ignore() {
 Token* scan_token() {
   ignore();
   scanner.start = scanner.ip;
-  if (is_numeric(peek())) {
+  if (is_numeric(scanner_peek())) {
     return create_numeric_token();
   }
 
-  if (is_alpha(peek())) {
+  if (is_alpha(scanner_peek())) {
     return create_identifier_token();
   }
 
@@ -263,38 +263,38 @@ Token* scan_token() {
       return create_token(T_COMMA, 0);
       break;
     case '!':
-      if (match("=", 1, 1)) {
+      if (token_match("=", 1, 1)) {
         return create_token(T_BANG_EQUAL, 1);
       }
       return create_token(T_BANG, 0);
     case '=':
-      if (match("=", 1, 1)) {
+      if (token_match("=", 1, 1)) {
         return create_token(T_EQUAL_EQUAL, 1);
       }
       return create_token(T_EQUAL, 0);
     case '>':
-      if (match("=", 1, 1)) {
+      if (token_match("=", 1, 1)) {
         return create_token(T_GREATER_EQUAL, 1);
       }
-      if (match(">", 1, 1)) {
+      if (token_match(">", 1, 1)) {
         return create_token(T_SHIFT_RIGHT, 1);
       }
       return create_token(T_GREATER, 0);
     case '<':
-      if (match("=", 1, 1)) {
+      if (token_match("=", 1, 1)) {
         return create_token(T_LESS_EQUAL, 1);
       }
-      if (match("<", 1, 1)) {
+      if (token_match("<", 1, 1)) {
         return create_token(T_SHIFT_LEFT, 1);
       }
       return create_token(T_LESS, 0);
     case '&':
-      if (match("&", 1, 1)) {
+      if (token_match("&", 1, 1)) {
         return create_token(T_AND, 1);
       }
       return create_token(T_AMPERSAND, 0);
     case '|':
-      if (match("|", 1, 1)) {
+      if (token_match("|", 1, 1)) {
         return create_token(T_OR, 1);
       }
       return create_token(T_BIT_OR, 0);

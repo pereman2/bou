@@ -16,7 +16,7 @@ struct Scanner {
 int get_tokens_len();
 void init_scanner(char* src);
 char next_char();
-bool match(const char* to_match, int len);
+bool token_match(const char* to_match, int len);
 Token* create_token(token_type type);
 Token* scan_token();
 Token** scan(char* src);
