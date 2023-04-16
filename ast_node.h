@@ -15,6 +15,7 @@
 #define get_if(node) node->value.statement.value.ifs
 #define get_func(node) node->value.statement.value.func
 #define get_struct(node) node->value.statement.value.structs
+#define get_union(node) node->value.statement.value.union_
 
 #define get_expression(node) node->value.expression
 #define get_statement(node) node->value.statement
@@ -35,7 +36,8 @@ typedef enum {
   BLOCK,
   IF,
   FUNC,
-  STRUCT
+  STRUCT,
+  UNION
 } node_type;
 
 enum binary_type {
@@ -132,6 +134,11 @@ struct AstIf {
   darray parameters;
 };
 
+struct AstUnion {
+  char* name;
+  darray parameters;  // AstIdentifier
+};
+
 struct AstStatement {
   node_type type;
   union {
@@ -140,6 +147,7 @@ struct AstStatement {
     AstIf ifs;
     AstFunc func;
     AstStruct structs;
+    AstUnion union_;
     // blocks,if,loop...
   } value;
 };

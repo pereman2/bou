@@ -175,6 +175,18 @@ std::string ast_statement_to_string(Ast_node* root) {
       ss << "}\n";
       break;
     }
+    case UNION: {
+      AstUnion* union_ = &get_union(root);
+      ss << "union @" << union_->name << " {\n";
+      for (int i = 0; i < darray_length(&union_->parameters, sizeof(AstIdentifier)); i++) {
+        AstIdentifier* param =
+            (AstIdentifier*)darray_get(&union_->parameters, sizeof(AstIdentifier), i);
+        ss << token_to_str(&param->token) << ": " << get_type(&param->type);
+        ss << ";\n";
+      }
+      ss << "}\n";
+      break;
+    }
   }
   return ss.str();
 }

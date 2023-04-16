@@ -21,6 +21,7 @@ enum token_type {
 
   T_DEF,
   T_STRUCT,
+  T_UNION,
   T_IF,
   T_ELSE,
   T_FOR,

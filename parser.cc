@@ -12,7 +12,6 @@
 #include "token.h"
 #include "util.h"
 
-
 Parser parser;
 
 Ast_node* parse(Token** tokens, int ntokens) {
@@ -72,6 +71,11 @@ Ast_node* create_ast_node(node_type type) {
       node->type = node_type::STATEMENT;
       get_statement(node).type = node_type::STRUCT;
       break;
+    case UNION:
+      init_darray(&get_union(node).parameters);
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::STRUCT;
+      break;
   }
   return node;
 }
@@ -111,8 +115,8 @@ Token* next_token() {
 
 bool expect(const token_type type) { return next_token()->type == type; }
 
-void ast_type_from_token(AstType *type, Token *token) {
-  switch(token->type) {
+void ast_type_from_token(AstType* type, Token* token) {
+  switch (token->type) {
     case T_INT:
       type->value = value_type::INT;
       break;
@@ -142,22 +146,22 @@ void ast_type_from_token(AstType *type, Token *token) {
       break;
   }
   uint32_t type_size = token->end - token->start;
-  type->ident_name = (char*)arena_allocate(parser.arena, type_size+1);
+  type->ident_name = (char*)arena_allocate(parser.arena, type_size + 1);
   memcpy(type->ident_name, token->start, type_size);
   type->ident_name[type_size] = '\0';
 }
 
-#define assert_parser(expr)               \
-  if (!(expr)) {                          \
+#define assert_parser(expr)                  \
+  if (!(expr)) {                             \
     printf("------- -1 token trace ----\n"); \
-    print_token(peek(-3));                 \
-    print_token(peek(-2));                 \
-    print_token(peek(-1));                 \
-    printf("------- token trace ----\n"); \
-    print_token(peek(0));                 \
-    print_token(peek(1));                 \
-    print_token(peek(2));                 \
-    assert(expr);                         \
+    print_token(peek(-3));                   \
+    print_token(peek(-2));                   \
+    print_token(peek(-1));                   \
+    printf("------- token trace ----\n");    \
+    print_token(peek(0));                    \
+    print_token(peek(1));                    \
+    print_token(peek(2));                    \
+    assert(expr);                            \
   }
 
 AstIdentifier get_ast_parameter() {
@@ -259,6 +263,29 @@ Ast_node* statement() {
 
       return node;
     }
+    case T_UNION: {
+      next_token();
+      Ast_node* node = create_ast_node(node_type::UNION);
+
+      assert_parser(match(T_IDENTIFIER));
+      Token* union_name = peek();
+      size_t name_size = union_name->end - union_name->start;
+      get_union(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
+      memcpy(get_union(node).name, union_name->start, name_size);
+      get_union(node).name[name_size] = '\0';
+      next_token();
+      assert_parser(expect(T_LEFT_BRACE));
+
+      while (match(T_IDENTIFIER)) {
+        AstIdentifier id = get_ast_parameter();
+        darray_push(&get_union(node).parameters, sizeof(AstIdentifier), &id);
+        assert_parser(expect(T_SEMICOLON));
+      }
+
+      assert_parser(expect(T_RIGHT_BRACE));
+
+      return node;
+    }
     default: {
       return expression();
     }
@@ -303,13 +330,13 @@ AstType binary_evaluates_to(AstType* left, AstType* right) {
   }
 
   if (left->value == value_type::FLOAT || right->value == value_type::FLOAT) {
-    type.value = value_type::FLOAT; 
+    type.value = value_type::FLOAT;
   } else if (left->value == value_type::INT || right->value == value_type::INT) {
-    type.value = value_type::INT; 
+    type.value = value_type::INT;
   } else if (left->value == value_type::CHAR || right->value == value_type::CHAR) {
-    type.value = value_type::CHAR; 
+    type.value = value_type::CHAR;
   } else if (left->value == value_type::BOOL || right->value == value_type::BOOL) {
-    type.value = value_type::BOOL; 
+    type.value = value_type::BOOL;
   } else {
     printf("Uknonwn evaluation\n");
     exit(1);
@@ -359,20 +386,20 @@ Ast_node* decl() {
   return logic();
 }
 
-AstIdentifier lookup_identifier(Token *ident_token) {
+AstIdentifier lookup_identifier(Token* ident_token) {
   return parser.identifiers[get_identifier_name(ident_token)];
 }
 
 Ast_node* logic() {
-  Ast_node *left = comparison();
+  Ast_node* left = comparison();
   bool added = 0;
-  if(match(T_AND) || match(T_OR)) {
+  if (match(T_AND) || match(T_OR)) {
     binary_type op = binary_type::AND;
     if (match(T_OR)) {
       op = binary_type::OR;
     }
     next_token();
-    Ast_node *node = create_ast_node(node_type::BINARY);
+    Ast_node* node = create_ast_node(node_type::BINARY);
     Ast_node* right = logic();
     get_binary(node).left = left;
     get_binary(node).right = right;
@@ -381,15 +408,14 @@ Ast_node* logic() {
   }
 
   return left;
-
 }
 
 Ast_node* comparison() {
-  Ast_node *left = assignment();
+  Ast_node* left = assignment();
   // TODO: T_BANG_EQUAL
-  if (match(T_EQUAL_EQUAL) || match(T_LESS) || match(T_LESS_EQUAL)
-      || match(T_GREATER) || match(T_GREATER_EQUAL)) {
-    Ast_node *node = create_ast_node(node_type::BINARY);
+  if (match(T_EQUAL_EQUAL) || match(T_LESS) || match(T_LESS_EQUAL) || match(T_GREATER) ||
+      match(T_GREATER_EQUAL)) {
+    Ast_node* node = create_ast_node(node_type::BINARY);
     get_expression(node).evaluates_to.is_pointer = false;
     get_expression(node).evaluates_to.value = value_type::BOOL;
     get_binary(node).left = left;
@@ -406,7 +432,7 @@ Ast_node* comparison() {
     } else {
       assert_parser(false);
     }
-    next_token(); 
+    next_token();
     get_binary(node).right = comparison();
     return node;
   }
@@ -422,8 +448,7 @@ Ast_node* assignment() {
       printf("Error, identifier %s isn't declared\n", get_identifier_name(ident).c_str());
       exit(1);
     }
-    Ast_node* node =
-        create_assign(binary_type::ASSIGN, ident, lookup_identifier(ident).type);
+    Ast_node* node = create_assign(binary_type::ASSIGN, ident, lookup_identifier(ident).type);
     get_binary_right(node) = term();
     get_expression(node).evaluates_to = get_expression(get_binary_right(node)).evaluates_to;
     return node;
@@ -453,8 +478,8 @@ Ast_node* term() {
     get_binary(bin).right = factor();
 
     get_expression(bin).evaluates_to =
-      binary_evaluates_to(&get_expression(get_binary(bin).left).evaluates_to,
-                          &get_expression(get_binary(bin).right).evaluates_to);
+        binary_evaluates_to(&get_expression(get_binary(bin).left).evaluates_to,
+                            &get_expression(get_binary(bin).right).evaluates_to);
 
     if (get_binary(bin).left->type == node_type::EXPRESSION &&
         get_binary(bin).right->type == node_type::EXPRESSION &&
@@ -478,13 +503,13 @@ Ast_node* term() {
   return t;
 }
 
-Ast_node* factor() { 
-  Ast_node *left = unary();
+Ast_node* factor() {
+  Ast_node* left = unary();
   if (match(T_STAR)) {
     next_token();
-    Ast_node *node = create_ast_node(node_type::BINARY);
-    Ast_node *right = unary();
-    get_binary(node).op = binary_type::MULT; 
+    Ast_node* node = create_ast_node(node_type::BINARY);
+    Ast_node* right = unary();
+    get_binary(node).op = binary_type::MULT;
     get_binary(node).left = left;
     get_binary(node).right = right;
     // TODO: add evaluation coercion depending of the values on the left, right
@@ -493,9 +518,9 @@ Ast_node* factor() {
   }
   if (match(T_SLASH)) {
     next_token();
-    Ast_node *node = create_ast_node(node_type::BINARY);
-    Ast_node *right = unary();
-    get_binary(node).op = binary_type::DIV; 
+    Ast_node* node = create_ast_node(node_type::BINARY);
+    Ast_node* right = unary();
+    get_binary(node).op = binary_type::DIV;
     get_binary(node).left = left;
     get_binary(node).right = right;
     // TODO: add evaluation coercion depending of the values on the left, right
@@ -509,14 +534,13 @@ Ast_node* unary() {
   if (match(T_MINUS)) {
     next_token();
     // We treat a "- something " as "0 - something"
-    Ast_node *node = create_ast_node(node_type::BINARY);
-    Ast_node *left = create_ast_node(node_type::LITERAL);
-    Ast_node *right = deref();
+    Ast_node* node = create_ast_node(node_type::BINARY);
+    Ast_node* left = create_ast_node(node_type::LITERAL);
+    Ast_node* right = deref();
     get_binary(node).left = left;
     get_binary(node).right = right;
     get_binary(node).op = binary_type::SUB;
-    switch(get_expression(right).evaluates_to.value )
-    {
+    switch (get_expression(right).evaluates_to.value) {
       case CHAR:
         printf("cannot negative char\n");
         exit(1);
@@ -539,8 +563,8 @@ Ast_node* unary() {
 
   if (match(T_BANG)) {
     next_token();
-    Ast_node *node = create_ast_node(node_type::UNARY);
-    Ast_node *value = deref();
+    Ast_node* node = create_ast_node(node_type::UNARY);
+    Ast_node* value = deref();
     // TODO: forbid negation of struct, enum...
     get_expression(node).evaluates_to = get_expression(value).evaluates_to;
     get_unary(node).type = unary_type::NEGATE;
@@ -554,7 +578,7 @@ Ast_node* unary() {
 Ast_node* deref() {
   if (match(T_STAR)) {
     next_token();
-    Ast_node *node = create_ast_node(node_type::UNARY);
+    Ast_node* node = create_ast_node(node_type::UNARY);
     get_unary(node).type = unary_type::DEREF;
     get_unary(node).node = ref();
     assert_parser(get_expression(get_unary(node).node).evaluates_to.is_pointer == true);
@@ -566,7 +590,7 @@ Ast_node* deref() {
 Ast_node* ref() {
   if (match(T_AMPERSAND)) {
     next_token();
-    Ast_node *node = create_ast_node(node_type::UNARY);
+    Ast_node* node = create_ast_node(node_type::UNARY);
     get_unary(node).type = unary_type::GET_PTR;
     get_unary(node).node = literal();
     assert_parser(get_expression(get_unary(node).node).evaluates_to.is_pointer == false);
@@ -610,13 +634,12 @@ Ast_node* literal() {
       get_literal(l).type = value_type::BOOL;
       type.value = value_type::BOOL;
       break;
-    case T_IDENTIFIER:
-      {
-        Ast_node* ident = create_ast_node(node_type::IDENTIFIER);
-        get_identifier(ident) = lookup_identifier(p);
-        get_expression(ident).evaluates_to = get_identifier(ident).type;
-        return ident;
-      }
+    case T_IDENTIFIER: {
+      Ast_node* ident = create_ast_node(node_type::IDENTIFIER);
+      get_identifier(ident) = lookup_identifier(p);
+      get_expression(ident).evaluates_to = get_identifier(ident).type;
+      return ident;
+    }
     default:
       printf("Error parsing literal");
       print_token(peek(0));

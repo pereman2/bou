@@ -143,6 +143,11 @@ Token* create_identifier_token() {
         return create_token(T_BOOL, 3);
       }
       break;
+    case 'u':
+      if (token_match("nion", 4, len)) {
+        return create_token(T_UNION, 4);
+      }
+      break;
     case 'w':
       if (token_match("hile", 4, len)) {
         return create_token(T_WHILE, 4);
