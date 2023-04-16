@@ -502,7 +502,7 @@ Ast_node* factor() {
     get_expression(node).evaluates_to = get_expression(left).evaluates_to;
     return node;
   }
-  return unary(); 
+  return left;
 }
 
 Ast_node* unary() {
@@ -623,7 +623,7 @@ Ast_node* literal() {
       print_token(peek(1));
       print_token(peek(2));
       print_token(peek(3));
-      exit(1);
+      abort();
   }
   get_expression(l).evaluates_to = type;
   return l;
