@@ -6,6 +6,8 @@
 
 #include "arena.h"
 
+#define DARRAY_PUSH(da, value) darray_push(da, sizeof(value), (void*)&value)
+
 #define darray_grow(da, amount)                 \
   {                                             \
     while (amount + da->count > da->capacity) { \

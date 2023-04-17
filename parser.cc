@@ -226,7 +226,7 @@ Ast_node* statement() {
 
       while (match(T_IDENTIFIER)) {
         AstIdentifier param = get_ast_parameter();
-        darray_push(&get_func(node).parameters, sizeof(AstIdentifier), &param);
+        DARRAY_PUSH(&get_func(node).parameters, param);
         if (match(T_COMMA)) {
           next_token();
         }
@@ -262,7 +262,7 @@ Ast_node* statement() {
 
       while (match(T_IDENTIFIER)) {
         AstIdentifier id = get_ast_parameter();
-        darray_push(&get_struct(node).parameters, sizeof(AstIdentifier), &id);
+        DARRAY_PUSH(&get_struct(node).parameters, id);
         assert_parser(expect(T_SEMICOLON));
       }
 
@@ -285,7 +285,7 @@ Ast_node* statement() {
 
       while (match(T_IDENTIFIER)) {
         AstIdentifier id = get_ast_parameter();
-        darray_push(&get_union(node).parameters, sizeof(AstIdentifier), &id);
+        DARRAY_PUSH(&get_union(node).parameters, id);
         assert_parser(expect(T_SEMICOLON));
       }
 
@@ -312,7 +312,8 @@ Ast_node* statement() {
         string_init_from(&param->name, identifier->start, len);
         // TODO: add explicit values 
         param->value = value++;
-        darray_push(&get_enum(node).enum_parameters, sizeof(AstEnumParameter), param);
+        DARRAY_PUSH(&get_enum(node).enum_parameters, *param);
+        DEALLOCATE(parser.arena, param);
         assert_parser(expect(T_SEMICOLON));
       }
 
@@ -331,7 +332,7 @@ Ast_node* parse_block() {
   Ast_node* node = create_ast_node(node_type::BLOCK);
   while (!match(T_RIGHT_BRACE) && !match(T_EOF)) {
     Ast_node* stmt = statement();
-    darray_push(&get_block(node).statements, sizeof(Ast_node), (void*)stmt);
+    DARRAY_PUSH(&get_block(node).statements, *stmt);
   };
   assert_parser(expect(T_RIGHT_BRACE));
   return node;

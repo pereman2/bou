@@ -11,6 +11,7 @@
 #include "util.h"
 #include "arena.h"
 
+
 darray* create_darray() {
   Allocator *dumb = allocator_create(DUMB, 0);
   darray* da = (darray*)malloc(sizeof(darray));
