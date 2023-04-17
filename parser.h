@@ -12,7 +12,7 @@ struct Parser {
   Token** tokens;
   int ntokens;
   int ip;
-  Arena* arena;
+  Allocator* arena;
   std::map<std::string, AstIdentifier> identifiers;
 };
 

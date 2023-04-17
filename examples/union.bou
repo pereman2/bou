@@ -1,0 +1,6 @@
+{ 
+  union Foo {
+    var: int;
+    gotem: char;
+  }
+}

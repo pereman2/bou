@@ -7,6 +7,7 @@
 #include "test_util.h"
 #include "token.h"
 
+#include "util.cc"
 #include "parser.cc"
 #include "darray.cc"
 #include "arena.cc"

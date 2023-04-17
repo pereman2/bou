@@ -113,6 +113,9 @@ Token* create_identifier_token() {
       if (token_match("lse", 3, len)) {
         return create_token(T_ELSE, 3);
       }
+      if (token_match("num", 3, len)) {
+        return create_token(T_ENUM, 3);
+      }
       break;
     case 'f':
       if (token_match("or", 3, len)) {

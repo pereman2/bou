@@ -2,6 +2,7 @@
 
 #include "darray.h"
 #include "token.h"
+#include "util.h"
 
 #define get_literal(node) node->value.expression.expr.literal
 #define get_unary(node) node->value.expression.expr.unary
@@ -16,6 +17,7 @@
 #define get_func(node) node->value.statement.value.func
 #define get_struct(node) node->value.statement.value.structs
 #define get_union(node) node->value.statement.value.union_
+#define get_enum(node) node->value.statement.value.enum_
 
 #define get_expression(node) node->value.expression
 #define get_statement(node) node->value.statement
@@ -37,7 +39,8 @@ typedef enum {
   IF,
   FUNC,
   STRUCT,
-  UNION
+  UNION,
+  ENUM
 } node_type;
 
 enum binary_type {
@@ -139,6 +142,17 @@ struct AstUnion {
   darray parameters;  // AstIdentifier
 };
 
+
+struct AstEnumParameter {
+  int value;
+  bou_string name;
+};
+
+struct AstEnum {
+  bou_string name;
+  darray enum_parameters; // Type: enum_parameter
+};
+
 struct AstStatement {
   node_type type;
   union {
@@ -148,6 +162,7 @@ struct AstStatement {
     AstFunc func;
     AstStruct structs;
     AstUnion union_;
+    AstEnum enum_;
     // blocks,if,loop...
   } value;
 };

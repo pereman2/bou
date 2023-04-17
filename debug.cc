@@ -187,6 +187,18 @@ std::string ast_statement_to_string(Ast_node* root) {
       ss << "}\n";
       break;
     }
+    case ENUM: {
+      AstEnum* enum_ = &get_enum(root);
+      ss << "enum @" << string_ref(&enum_->name) << " {\n";
+      for (int i = 0; i < darray_length(&enum_->enum_parameters, sizeof(AstEnumParameter)); i++) {
+        AstEnumParameter* param =
+            (AstEnumParameter*)darray_get(&enum_->enum_parameters, sizeof(AstEnumParameter), i);
+        ss << string_ref(&param->name) << "=" << param->value;
+        ss << ";\n";
+      }
+      ss << "}\n";
+      break;
+    }
   }
   return ss.str();
 }
@@ -381,6 +393,9 @@ void print_token(Token* t) {
       break;
     case T_OR:
       type = "T_OR";
+      break;
+    case T_ENUM:
+      type = "T_ENUM";
       break;
     default:
       type = "Uknown token";

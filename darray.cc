@@ -9,15 +9,34 @@
 #include <cstddef>
 
 #include "util.h"
+#include "arena.h"
 
 darray* create_darray() {
+  Allocator *dumb = allocator_create(DUMB, 0);
   darray* da = (darray*)malloc(sizeof(darray));
+  da->allocator = dumb;
   return da;
 }
+
+darray* create_darray(Allocator *allocator) {
+  darray* da = (darray*)malloc(sizeof(darray));
+  da->allocator = allocator;
+  return da;
+}
+
 void init_darray(darray* da) {
   da->capacity = 8;
   da->count = 0;
-  da->src = (char*)malloc(8);
+  da->allocator = DUMB_ALLOCATOR;
+  da->src = (char*)ALLOCATE(da->allocator, 8);
+}
+
+void init_darray(darray* da, Allocator *allocator) {
+  assert(allocator);
+  da->capacity = 8;
+  da->count = 0;
+  da->allocator = allocator;
+  da->src = (char*)ALLOCATE(da->allocator, 8);
 }
 
 void free_darray(darray* da) { free(da->src); }
@@ -55,7 +74,9 @@ void push_string(darray* da, int num_bytes, const char* str) {
 
 void grow_darray(darray* da) {
   std::size_t new_capacity = (da->capacity << 1);
-  char* r = (char*)realloc(da->src, new_capacity);
+  char* r = (char*)ALLOCATE(da->allocator, new_capacity);
+  memcpy(r, da->src, da->capacity);
+  DEALLOCATE(da->allocator, da->src);
   ensure_alloc(r, __FILE__, __LINE__);
   da->capacity = new_capacity;
   da->src = r;

@@ -27,7 +27,7 @@ Ast_node* parse(Token** tokens, int ntokens) {
 }
 
 Ast_node* create_ast_node(node_type type) {
-  Ast_node* node = (Ast_node*)arena_allocate(parser.arena, sizeof(Ast_node));
+  Ast_node* node = (Ast_node*)ALLOCATE(parser.arena, sizeof(Ast_node));
   node->type = type;
   switch (type) {
     case LITERAL:
@@ -50,7 +50,7 @@ Ast_node* create_ast_node(node_type type) {
       get_expression(node).type = node_type::IDENTIFIER;
       break;
     case BLOCK:
-      init_darray(&get_block(node).statements);
+      init_darray(&get_block(node).statements, parser.arena);
       node->type = node_type::STATEMENT;
       get_statement(node).type = node_type::BLOCK;
       break;
@@ -61,20 +61,26 @@ Ast_node* create_ast_node(node_type type) {
       get_if(node).else_block = NULL;
       break;
     case FUNC:
-      init_darray(&get_func(node).parameters);
+      init_darray(&get_func(node).parameters, parser.arena);
       node->type = node_type::STATEMENT;
       get_statement(node).type = node_type::FUNC;
       get_func(node).block = NULL;
       break;
     case STRUCT:
-      init_darray(&get_struct(node).parameters);
+      init_darray(&get_struct(node).parameters, parser.arena);
       node->type = node_type::STATEMENT;
       get_statement(node).type = node_type::STRUCT;
       break;
     case UNION:
-      init_darray(&get_union(node).parameters);
+      init_darray(&get_union(node).parameters, parser.arena);
       node->type = node_type::STATEMENT;
-      get_statement(node).type = node_type::STRUCT;
+      get_statement(node).type = node_type::UNION;
+      break;
+    case ENUM:
+      init_darray(&get_enum(node).enum_parameters, parser.arena);
+      string_init(&get_enum(node).name);
+      node->type = node_type::STATEMENT;
+      get_statement(node).type = node_type::ENUM;
       break;
   }
   return node;
@@ -146,7 +152,7 @@ void ast_type_from_token(AstType* type, Token* token) {
       break;
   }
   uint32_t type_size = token->end - token->start;
-  type->ident_name = (char*)arena_allocate(parser.arena, type_size + 1);
+  type->ident_name = (char*)ALLOCATE(parser.arena, type_size + 1);
   memcpy(type->ident_name, token->start, type_size);
   type->ident_name[type_size] = '\0';
 }
@@ -187,6 +193,7 @@ AstIdentifier get_ast_parameter() {
 }
 
 Ast_node* statement() {
+  ignore_lf();
   switch (peek()->type) {
     case T_LEFT_BRACE: {
       return parse_block();
@@ -210,7 +217,7 @@ Ast_node* statement() {
       assert_parser(match(T_IDENTIFIER));
       Token* func_name = peek();
       size_t name_size = func_name->end - func_name->start;
-      get_func(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
+      get_func(node).name = (char*)ALLOCATE(parser.arena, name_size + 1);
       memcpy(get_func(node).name, func_name->start, name_size);
       get_func(node).name[name_size] = '\0';
 
@@ -247,7 +254,7 @@ Ast_node* statement() {
       assert_parser(match(T_IDENTIFIER));
       Token* func_name = peek();
       size_t name_size = func_name->end - func_name->start;
-      get_struct(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
+      get_struct(node).name = (char*)ALLOCATE(parser.arena, name_size + 1);
       memcpy(get_struct(node).name, func_name->start, name_size);
       get_struct(node).name[name_size] = '\0';
       next_token();
@@ -270,7 +277,7 @@ Ast_node* statement() {
       assert_parser(match(T_IDENTIFIER));
       Token* union_name = peek();
       size_t name_size = union_name->end - union_name->start;
-      get_union(node).name = (char*)arena_allocate(parser.arena, name_size + 1);
+      get_union(node).name = (char*)ALLOCATE(parser.arena, name_size + 1);
       memcpy(get_union(node).name, union_name->start, name_size);
       get_union(node).name[name_size] = '\0';
       next_token();
@@ -279,6 +286,33 @@ Ast_node* statement() {
       while (match(T_IDENTIFIER)) {
         AstIdentifier id = get_ast_parameter();
         darray_push(&get_union(node).parameters, sizeof(AstIdentifier), &id);
+        assert_parser(expect(T_SEMICOLON));
+      }
+
+      assert_parser(expect(T_RIGHT_BRACE));
+
+      return node;
+    }
+    case T_ENUM: {
+      next_token();
+      Ast_node* node = create_ast_node(node_type::ENUM);
+
+      assert_parser(match(T_IDENTIFIER));
+      Token* enum_name = peek();
+      size_t name_size = enum_name->end - enum_name->start;
+      string_init_from(&get_enum(node).name, enum_name->start, name_size);
+      next_token();
+      assert_parser(expect(T_LEFT_BRACE));
+
+      int value = 0;
+      while (match(T_IDENTIFIER)) {
+        AstEnumParameter *param = (AstEnumParameter*) ALLOCATE(parser.arena, sizeof(AstEnumParameter));
+        Token* identifier = next_token();
+        uint64_t len = identifier->end - identifier->start;
+        string_init_from(&param->name, identifier->start, len);
+        // TODO: add explicit values 
+        param->value = value++;
+        darray_push(&get_enum(node).enum_parameters, sizeof(AstEnumParameter), param);
         assert_parser(expect(T_SEMICOLON));
       }
 

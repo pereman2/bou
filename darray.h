@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+
+#include "arena.h"
 
 #define darray_grow(da, amount)                 \
   {                                             \
@@ -20,9 +23,11 @@
 typedef struct darray {
   char* src;
   std::size_t capacity, count;
+  Allocator* allocator;
 } darray;
 
 darray* create_darray();
+darray* create_darray(Allocator* allocator);
 
 void* darray_get(darray* da, size_t size, int i);
 void darray_push(darray* da, size_t size, void* value);
@@ -37,6 +42,7 @@ void push_darray(darray* dest, darray* src);
 void push_string(darray* da, int num_bytes, const char* str);
 void grow_darray(darray* da);
 void init_darray(darray* da);
+void init_darray(darray* da, Allocator *allocator);
 void free_darray(darray* da);
 std::size_t length(darray* da);
 void write_to_file(darray* da, const char* path);

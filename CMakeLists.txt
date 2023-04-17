@@ -19,4 +19,6 @@ add_executable(test_ast
 add_executable(test
   test_darray.cc
   darray.cc
+  util.cc
+  arena.cc
 	)
